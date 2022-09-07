@@ -157,15 +157,14 @@ y <- LETTERS[1:12]
 z <- c(F, T, FALSE)
 name_ls <- c("x", "y", "z")
 da_ls <- list(x, y, z)
-print("dim运行结果: ")
 print(paste(name_ls, "dim:", sapply(da_ls, dim)), sep = " ")
-print("is.numeric运行结果: ")
+
 print(paste(name_ls, "is.numeric:", sapply(da_ls, is.numeric), sep = " "))
-print("is.character运行结果: ")
+
 print(paste(name_ls, "is.character:", sapply(da_ls, is.character), sep = " "))
-print("is.logical运行结果: ")
+
 print(paste(name_ls, "is.logical:", sapply(da_ls, is.logical), sep = " "))
-print("length运行结果: ")
+
 print(paste(name_ls, "length:", sapply(da_ls, length), sep = " "))
 ```
 
