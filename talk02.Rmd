@@ -129,9 +129,9 @@ vector只能包含一种基本数据类型。因此，在定义数组时，如�
 
 \FontSmall
 ```{r}
-class( c(45, TRUE, 20, FALSE, -100) ); ## 逻辑和数字类型
-str( c("string a", FALSE, "string b", TRUE) ); ## 逻辑和字符
-str( c("a string", 1.2, "another string", 1e-3) ); ## 数字和字符
+class( c(45, TRUE, 20, FALSE, -100) ) ## 逻辑和数字类型
+str( c("string a", FALSE, "string b", TRUE) ) ## 逻辑和字符
+str( c("a string", 1.2, "another string", 1e-3) ) ## 数字和字符
 ```
 
 ## 矩阵(matrix)
@@ -143,7 +143,7 @@ str( c("a string", 1.2, "another string", 1e-3) ); ## 数字和字符
 \FontSmall
 
 ```{r}
-matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2, byrow = T );
+matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2, byrow = T )
 ```
 
 ## Matrix 函数的参数
@@ -166,15 +166,15 @@ matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2, byrow = T );
 
 \FontSmall
 ```{r}
-matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2, byrow = T );
+matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2, byrow = T )
 ```
 ```{r}
-matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2, byrow = F );
+matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2, byrow = F )
 ```
 
 ```{r}
 matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2, 
-       dimnames = list( c("row_A", "row_B"), c("A", "B", "C") ) );
+       dimnames = list( c("row_A", "row_B"), c("A", "B", "C") ) )
 ```
 
 ## `matrix()`同时指定 ncol 和 nrow 
@@ -185,11 +185,11 @@ matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2,
 
 ```{r}
 ## 生成一个2x5长度为10的矩阵，但输入数据的长度为20
-matrix( 1:20, nrow = 2, ncol = 5, byrow = T); 
+matrix( 1:20, nrow = 2, ncol = 5, byrow = T) 
 ```
 ```{r}
 ## 生成一个2x3长度为6的矩阵，但输入数据长度只有3
-matrix( 1:3, nrow = 2, ncol = 3, byrow = T ); 
+matrix( 1:3, nrow = 2, ncol = 3, byrow = T ) 
 ```
 
 ## `matrix()`更多测试
@@ -200,7 +200,7 @@ matrix( 1:3, nrow = 2, ncol = 3, byrow = T );
 \FontSmall
 
 ```{r}
-matrix( 1:3, nrow = 2, ncol = 4, byrow = T );
+matrix( 1:3, nrow = 2, ncol = 4, byrow = T )
 ```
 
 ## `matrix()`更多测试， cont. 
@@ -210,7 +210,7 @@ matrix( 1:3, nrow = 2, ncol = 4, byrow = T );
 \FontSmall
 
 ```{r}
-matrix( letters[1:20], nrow = 3, ncol = 5, byrow = T );
+matrix( letters[1:20], nrow = 3, ncol = 5, byrow = T )
 ```
 
 ## 用`? matrix ` 命令获得帮助
@@ -225,11 +225,11 @@ matrix( letters[1:20], nrow = 3, ncol = 5, byrow = T );
 
 ```{r}
 class(matrix( c(20, 30.1, 2, 45.8, 23, 14), 
-              nrow = 2, byrow = T ));
+              nrow = 2, byrow = T ))
 ```
 ```{r}
 str(matrix( c(20, 30.1, 2, 45.8, 23, 14), 
-            nrow = 2, byrow = T ));
+            nrow = 2, byrow = T ))
 ```
 
 \FontNormal 
@@ -247,7 +247,7 @@ array( data = LETTERS[1:16],
       dim  = c(2,4,2), 
       dimnames = list( c("A","B"), 
                       c("one","two","three","four"), 
-                      c("一", "二") ));
+                      c("一", "二") ))
 ```
 
 
@@ -260,8 +260,8 @@ array( data = LETTERS[1:16],
 \FontSmall
 
 ```{r eval=FALSE}
-1 + 2 - 3 * 4 / 5; ## 加减乘除
-1 + (2 - 3) * 4 / 5;  ##  改变优先级
+1 + 2 - 3 * 4 / 5 ## 加减乘除
+1 + (2 - 3) * 4 / 5  ##  改变优先级
 ```
 
 \FontNormal
@@ -271,8 +271,8 @@ array( data = LETTERS[1:16],
 \FontSmall
 
 ```{r eval=FALSE}
-2 ^ 6; ## 阶乘
-5 %% 2; ## 取余
+2 ^ 6 ## 阶乘
+5 %% 2 ## 取余
 ```
 
 \FontNormal
@@ -282,9 +282,9 @@ array( data = LETTERS[1:16],
 \FontSmall
 
 ```{r eval=FALSE}
-T | F; ## or 
-T & F; ## and
-5 | 0; ## == 0 FALSE， > 0 TRUE
+T | F ## or 
+T & F ## and
+5 | 0 ## == 0 FALSE， > 0 TRUE
 ```
 
 \FontNormal 
@@ -308,13 +308,13 @@ T & F; ## and
 
 ```{r eval=FALSE}
 ## 常用
-x <- c(10,100,1000, 10000);
+x <- c(10,100,1000, 10000)
 ## -- 也可以； 
-x = c(10,100,1000, 10000);
+x = c(10,100,1000, 10000)
 ## -- 少见
-c(10,100,1000, 10000) -> x;
+c(10,100,1000, 10000) -> x
 ## -- ？？？ 
-assign( "x", c(10, 100, 1000, 10000) );
+assign( "x", c(10, 100, 1000, 10000) )
 ```
 
 \FontNormal 
@@ -330,9 +330,9 @@ assign( "x", c(10, 100, 1000, 10000) );
 \FontSmall
 
 ```{r echo=TRUE, message=FALSE}
-x <- c(10,100,1000, 10000);
+x <- c(10,100,1000, 10000)
 m <- matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2, 
-       dimnames = list( c("row_A", "row_B"), c("A", "B", "C") ) );
+       dimnames = list( c("row_A", "row_B"), c("A", "B", "C") ) )
 ```
 
 ![RStudio enviroment window](images/talk02/enviroment_screenshot.png){height=30%}
@@ -342,11 +342,11 @@ m <- matrix( c(20, 30.1, 2, 45.8, 23, 14), nrow = 2,
 \FontSmall
 
 ```{r}
-ls();  ## 显示当前环境下所有变量
-rm( x ); ## 删除一个变量
-ls(); 
+ls()  ## 显示当前环境下所有变量
+rm( x ) ## 删除一个变量
+ls() 
 
-##rm(list=ls()); ## 删除当前环境下所有变量！！！ 
+##rm(list=ls()) ## 删除当前环境下所有变量！！！ 
 ```
 
 ## vector 算术, cont.
@@ -356,8 +356,8 @@ ls();
 \FontSmall
 
 ```{r}
-x <- c(10,100,1000, 10000);
-( y <- sqrt( x  ) * 4 + 10  ); ## 赋值的之后打印变量内容 
+x <- c(10,100,1000, 10000)
+( y <- sqrt( x  ) * 4 + 10  ) ## 赋值的之后打印变量内容 
 ```
 
 \FontNormal
@@ -367,11 +367,11 @@ x <- c(10,100,1000, 10000);
 \FontSmall
 
 ```{r}
-x / c(10,100);
+x / c(10,100)
 ```
 
 ```{r}
-x / c(10,100,1000); ## 会报错但仍会循环计算
+x / c(10,100,1000) ## 会报错但仍会循环计算
 ```
 
 ## matrix 的算术
@@ -381,12 +381,12 @@ x / c(10,100,1000); ## 会报错但仍会循环计算
 \FontSmall
 
 ```{r}
-knitr::kable(m);
+knitr::kable(m)
 ```
 
 ```{r}
-m / 10;
-m /  c(1,10,100);
+m / 10
+m /  c(1,10,100)
 ```
 
 ## matrix 的算术, cont.
@@ -394,19 +394,19 @@ m /  c(1,10,100);
 \FontSmall
 
 ```{r}
-m / c(1,10);
-m / c(1,10,100,1000); ## 多于列数
+m / c(1,10)
+m / c(1,10,100,1000) ## 多于列数
 ```
 
 ## 更多  matrix 相关函数 
 
 **注**：其中许多也要用于其它数据类型（以后会讲到）
 
-- dim( m );
-- nrow( m );
-- ncol( m );
-- range( m ); ## 内容是数字时
-- summary( m  ); ## 也可用于 vector 
+- dim( m )
+- nrow( m )
+- ncol( m )
+- range( m ) ## 内容是数字时
+- summary( m  ) ## 也可用于 vector 
 
 ## vector manipulation
 
@@ -415,11 +415,11 @@ m / c(1,10,100,1000); ## 多于列数
 \FontSmall
 
 ```{r}
-a <- 1:3;
-b <- LETTERS[1:3];
+a <- 1:3
+b <- LETTERS[1:3]
 
-( ab <- c(a,b) );
-mode( ab ); ## 一个新的函数~ ... 
+( ab <- c(a,b) )
+mode( ab ) ## 一个新的函数~ ... 
 ```
 
 ## vector manipulation, cont.
@@ -429,10 +429,10 @@ mode( ab ); ## 一个新的函数~ ...
 \FontSmall
 
 ```{r}
-ab[1];
-ab[ c(1, 4, 5) ];
-ab[ 2:5 ];
-ab[ length(ab) ]; ## length 函数
+ab[1]
+ab[ c(1, 4, 5) ]
+ab[ 2:5 ]
+ab[ length(ab) ] ## length 函数
 ```
 
 ## vector manipultaion, cont.
@@ -442,7 +442,7 @@ ab[ length(ab) ]; ## length 函数
 \FontSmall
 
 ```{r}
-( ab[1] <- "一" );
+( ab[1] <- "一" )
 ```
 
 ## vector manipulation, cont.
@@ -452,7 +452,7 @@ ab[ length(ab) ]; ## length 函数
 \FontSmall
 
 ```{r}
-ab[c(2,3)] <- c("二", "三");
+ab[c(2,3)] <- c("二", "三")
 ab
 ```
 
@@ -463,11 +463,11 @@ ab
 \FontSmall
 
 ```{r}
-( names( ab ) <- as.character( ab ) ); ## 注意 names() 和 as.character() 函数的用法
+( names( ab ) <- as.character( ab ) ) ## 注意 names() 和 as.character() 函数的用法
 
-ab[ c("A", "B") ] <- c("ah", "bo");
+ab[ c("A", "B") ] <- c("ah", "bo")
 
-ab;
+ab
 ```
 
 ## vector manipulation, cont.
@@ -478,14 +478,15 @@ ab;
 
 ```{r}
 ## reverse
-rev(1:10);
+rev(1:10)
 ```
 
 ```{r}
 ## sort  & order 
-lts <- sample( LETTERS[1:20] );
-sort( lts );
-order( lts  ); ## 注意与 sort 的不同
+lts <- sample( LETTERS[1:20] )
+sort( lts )
+order( lts  ) ## 注意与 sort 的不同
+# order 报告的是排序后的位置index
 ```
 
 ## matrix manipulation
@@ -495,10 +496,10 @@ order( lts  ); ## 注意与 sort 的不同
 \FontSmall
 
 ```{r}
-m;
+m
 
-m[ 1 , ];
-m[ 1:2,  ];
+m[ 1 , ]
+m[ 1:2,  ]
 ```
 
 ## matrix manipulation, cont.
@@ -519,9 +520,9 @@ m[ c( "row_B", "row_A" ), ] ## 注意取的顺序
 \FontSmall
 
 ```{r}
-m[ , 1 ];
-m[, c(1,2)];
-m[, c("B","A")];## 注意取的顺序
+m[ , 1 ]
+m[, c(1,2)]
+m[, c("B","A")]## 注意取的顺序
 ```
 
 ## matrix manipulation, cont.
@@ -531,9 +532,9 @@ m[, c("B","A")];## 注意取的顺序
 \FontSmall
 
 ```{r}
-m;
+m
 
-m[1:2, 2:3]; ## 取其中一部分
+m[1:2, 2:3] ## 取其中一部分
 ```
 
 ## matrix manipulation, cont.
@@ -543,8 +544,8 @@ m[1:2, 2:3]; ## 取其中一部分
 \FontSmall
 
 ```{r}
-m;
-m[1, ] <- c(10);
+m
+m[1, ] <- c(10)
 ```
 
 ## matrix manipulation, cont.
@@ -554,8 +555,8 @@ m[1, ] <- c(10);
 \FontSmall
 
 ```{r}
-m[, "C"] <- c(230, 140);
-m;
+m[, "C"] <- c(230, 140)
+m
 ```
 
 ## matrix manipulation, cont.
@@ -566,10 +567,10 @@ m;
 
 ```{r, eval=FALSE}
 ## -- 替换前两行
-m[ 1:2 , ] <- matrix(  1:6, nrow = 2 );
+m[ 1:2 , ] <- matrix(  1:6, nrow = 2 )
 
 ## -- 替换其中两列
-m[  , c("C", "B") ] <- matrix(  100:103, nrow = 2 );
+m[  , c("C", "B") ] <- matrix(  100:103, nrow = 2 )
 ```
 
 ### 替换 subset 
@@ -577,7 +578,7 @@ m[  , c("C", "B") ] <- matrix(  100:103, nrow = 2 );
 \FontSmall
 
 ```{r, eval=FALSE}
-m[ 1  , c("C", "B") ] <- matrix(  110:111, nrow = 1 );
+m[ 1  , c("C", "B") ] <- matrix(  110:111, nrow = 1 )
 ```
 
 ### 转置
@@ -585,7 +586,7 @@ m[ 1  , c("C", "B") ] <- matrix(  110:111, nrow = 1 );
 \FontSmall
 
 ```{r}
-t(m);
+t(m)
 ```
 
 
@@ -602,16 +603,16 @@ t(m);
 \FontSmall
 
 ```{r}
-typeof(letters);
-typeof(1:10);
+typeof(letters)
+typeof(1:10)
 
-typeof( list("a", "b", 1:10) );
+typeof( list("a", "b", 1:10) )
 
-typeof( 1:10 %% 3 == 0 );
+typeof( 1:10 %% 3 == 0 )
 
-typeof(1);
+typeof(1)
 
-typeof(1L);
+typeof(1L)
 ```
 
 ## NULL
@@ -621,7 +622,7 @@ typeof(1L);
 \FontSmall
 
 ```{r}
-typeof( NULL );
+typeof( NULL )
 ```
 
 ## 特别值以及它们是如何产生的
@@ -631,7 +632,7 @@ typeof( NULL );
 \FontSmall
 
 ```{r}
-c(-1, 0, 1) / 0;
+c(-1, 0, 1) / 0
 ```
 
 `NA `
@@ -658,15 +659,15 @@ c(-1, 0, 1) / 0;
 \FontSmall
 
 ```{r eval=FALSE}
-is.null( NULL );
-is.numeric( NA );
-is.numeric( Inf );
+is.null( NULL )
+is.numeric( NA )
+is.numeric( Inf )
 
 ## 用于替代 typeof 的函数
-is.list();
-is.logical();
-is.character();
-is.vector();
+is.list()
+is.logical()
+is.character()
+is.vector()
 
 ## 更多 ... 
 ```
