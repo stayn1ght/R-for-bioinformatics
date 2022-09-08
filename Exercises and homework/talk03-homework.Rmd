@@ -112,6 +112,9 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
+state.center
+class(state.center)
+data.frame(state.center)
 ```
 
 ------------------------------------------------------------------------
@@ -120,7 +123,9 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+m <- matrix(sample(50 * 5), nrow = 50, ncol = 5)
+rownames(m) <- paste0("row_", 1:50)
+m
 ```
 
 ------------------------------------------------------------------------
@@ -135,7 +140,10 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+class(VADeaths)
+df_deaths <- data.frame(VADeaths)
+df_deaths$Total <- rowSums(df_deaths)
+df_deaths <- df_deaths[, c(ncol(df_deaths), 1:(ncol(df_deaths) - 1))]
 ```
 
 ------------------------------------------------------------------------
@@ -150,7 +158,11 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+swiss[c(1, 2, 3, 10, 11, 12, 13), c("Examination", "Education", "Infant.Mortality")]
+swiss["Sarine", "Infant.Mortality"] <- NA
+swiss
+swiss$Mean <- rowMeans(swiss)
+swiss
 ```
 
 ------------------------------------------------------------------------
@@ -165,16 +177,21 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+Id <- LETTERS
+x <- seq(1, 43, along.with = Id)
+y <- seq(-20, 0, along.with = Id)
+data.frame(Id, x, y)
 ```
 
 **问：** `seq`函数中的`along.with` 参数的意义是什么？请举例说明。
 
-答：
+答：seq函数中的along.with参数的意义是指定序列的长度，即along.with参数指定的变量的长度。
+
 
 ```{r}
 ## 代码写这里，并运行；
-
+seq(1, 19, along.with = 1:10)
+seq(1, 19, along.with = 1:19)
 ```
 
 ------------------------------------------------------------------------
@@ -208,7 +225,15 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+library(dplyr)
+Id <- 1:4
+Age <- c(14, 12, 15, 10)
+Sex <- c("F", "M", "M", "F")
+Code <- c("a", "b", "c", "d")
+df1 <- data.frame(Id, Age)
+df2 <- data.frame(Id, Sex, Code)
+M <- left_join(df1, df2, by = "Id")
+M
 ```
 
 ------------------------------------------------------------------------
@@ -217,7 +242,8 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+M <- M[, -4]
+M
 ```
 
 ------------------------------------------------------------------------
@@ -227,7 +253,7 @@ Sys.getenv("HOME")
 <!-- -->
 
     ## 1. 生成一个10 行2 列的data.frame
-    df3 <- data.frame( data = 1:10, group = c("A","B") );
+    df3 <- data.frame( data = 1:10, group = c("A","B") )
     ## 2. 增加一列，其长度是1，可以吗？
     cbind(df3, newcol = 1);
     ## 3. 增加一列，其长度是10，可以吗？
@@ -237,7 +263,7 @@ Sys.getenv("HOME")
     ## 5. 增加一列，其长度是3，可以吗？
     cbind(df3, newcol = 1:3);
 
-答：
+答：2. 可以，3. 可以，4. 可以，5. 不可以。
 
 ## 练习与作业2，`tibble`
 
@@ -291,7 +317,12 @@ tibble(
 
 ```{r}
 ## 代码写这里，并运行；
-
+df <- tibble(
+  x = runif(5),
+  y = rnorm(5)
+)
+df["x"]
+df$y
 ```
 
 ------------------------------------------------------------------------
@@ -304,8 +335,8 @@ tibble(
 tb <- tibble( name = character(), age = integer(), salary = double() );
 
 ##增加三行随机数据；
-
-
+tb <- add_row(tb, name = sample(letters, 3), age = sample(50, 3), salary = sample(1000, 3))
+tb
 ```
 
 ------------------------------------------------------------------------
@@ -322,7 +353,7 @@ tb <- tibble( name = character(), age = integer(), salary = double() );
 
 问：为什么？tibble 循环的规则是什么？
 
-答：
+答：Only values of size one are recycled.
 
 ------------------------------------------------------------------------
 
@@ -330,7 +361,16 @@ tb <- tibble( name = character(), age = integer(), salary = double() );
 
 问：这个两个函数的用途是什么？请用 `iris` 这个系统自带变量举例说明。
 
-答：
+答：attach()函数将一个数据框绑定到当前的搜索路径中，这样就可以直接使用数据框中的变量名而不用加上数据框的名字。detach()函数将一个数据框从当前的搜索路径中分离出来。
+
+```{r}
+head(Sepal.Length)
+# Sepal.Length是iris数据框中的变量名，但是在当前的搜索路径中没有，所以不能直接使用
+attach(iris)
+# attach()函数将iris数据框绑定到当前的搜索路径中，之后就可以直接访问Sepal.Length这个变量了
+head(Sepal.Length)
+detach(iris)
+```
 
 ------------------------------------------------------------------------
 
@@ -342,20 +382,30 @@ tb <- tibble( name = character(), age = integer(), salary = double() );
 
 ```{r}
 ## 代码写这里，并运行；
-
+is_tibble(airquality)
+airquality <- as_tibble(airquality)
+is_tibble(airquality)
 ```
 
 ------------------------------------------------------------------------
 
 -   **问：`tibble::enframe`函数的用途是什么？请举例说明：**
 
-答：
+答：enframe()函数将一个向量转换为一个数据框，其中第一列是向量的名字，第二列是向量的值。
+
+```{r}
+head(iris$Sepal.Length, n = 10)
+enframe(iris$Sepal.Length[1:10])
+```
 
 ------------------------------------------------------------------------
 
 -   **简述`tibble`相比`data.frame`的优势？并用实例展示**
 
-答：
+答： tibble显示每一列的数据类型，而data.frame不显示。
+tibble按顺序计算列，而data.frame同时计算所有列。
+tibble取子集将得到一个tibble，而data.frame取子集可能得到vector。
+data.frame存在部分匹配的问题，而tibble不存在。
 
 ```{r}
 ## 代码写这里，并运行；
