@@ -432,7 +432,16 @@ data.frame存在部分匹配的问题，而tibble不存在。
 
 ```{r}
 ## 用系统自带函数，并显示读取的内容；
-
+read.table("data/Table0.txt", header = FALSE)
+read.table("data/Table1.txt", header = FALSE)
+read.table("data/Table2.txt", header = FALSE)
+read.table("data/Table3.txt", header = FALSE)
+read.table("data/Table4.txt", header = FALSE)
+read.table("data/Table5.txt", header = FALSE)
+read.table("data/Table6.txt", header = FALSE)
+read.csv("data/states1.csv", header = FALSE)
+read.csv("data/states2.csv", header = FALSE)
 ## 用readr 包的函数读取，并显示读取的内容；
+read_table("data/Table0.txt", col_names = FALSE)
 
 ```
