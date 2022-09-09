@@ -435,9 +435,13 @@ data.frame存在部分匹配的问题，而tibble不存在。
 read.table("data/Table0.txt", header = FALSE)
 read.table("data/Table1.txt", header = TRUE)
 read.table("data/Table2.txt", header = TRUE, sep = "\t", quote = "/", skip = 1)
-read.table("data/Table3.txt", header = TRUE, sep = "\t", skip = 1)
-read.table("data/Table4.txt", header = TRUE)
-read.table("data/Table5.txt", header = TRUE, sep = ";")
+read.table("data/Table3.txt", header = TRUE, sep = "\t", skip = 1, na.strings = c("","NA","--","*","**"))
+# Table4.txt 身高数据 Height 中的值有逗号需要去掉
+with(read.table("data/Table4.txt", header = TRUE, sep = "\t", 
+  skip = 1, na.strings = c("","NA","--","*","**")), 
+  Height <- as.numeric(gsub(",", "", Height)))
+
+read.table("data/Table5.txt", header = TRUE, sep = ";", na.strings = c("","NA","--","*","**"))
 # Table6.txt中 @ 为注释符号，需要去掉
 read.table("data/Table6.txt", header = TRUE, sep = "\t", comment.char = "@", skip = 1)
 
@@ -445,17 +449,13 @@ read.csv("data/states1.csv", header = TRUE)
 # states2.csv中 分隔符是 ";"
 read.csv("data/states2.csv", header = TRUE, sep = ";")
 ## 用readr 包的函数读取，并显示读取的内容；
-read_table("data/Table0.txt", col_names = FALSE)
-read_table("data/Table1.txt", col_names = TRUE)
-read_table("data/Table2.txt", col_names = TRUE, sep = "\t", quote = "/", skip = 1)
-read_table("data/Table3.txt", col_names = TRUE, sep = "\t", skip = 1)
-read_table("data/Table4.txt", col_names = TRUE)
-read_table("data/Table5.txt", col_names = TRUE, sep = ";")
-# Table6.txt中 @ 为注释符号，需要去掉
-read_table("data/Table6.txt", col_names = TRUE, sep = "\t", comment = "@", skip = 1)
+# 读取 Table0.txt
+read_tsv("data/Table0.txt", col_names = FALSE)
+# 读取 Table1.txt，注意这里的 col_names = TRUE
+read_tsv("data/Table1.txt", col_names = TRUE)
+# 读取 Table2.txt，字符串引用符号为 /，跳过第一行
 
-read_csv("data/states1.csv", col_names = TRUE)
-# states2.csv中 分隔符是 ";"
-read_csv("data/states2.csv", col_names = TRUE, sep = ";")
+
+
 
 ```

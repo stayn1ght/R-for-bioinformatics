@@ -77,7 +77,7 @@ Sys.getenv("HOME")
 
 `x <- c("single", "married", "married", "single");`
 
-* 为其增加 两个 levels，`single`, `married`;
+* 为x增加 两个 levels，`single`, `married`;
 
 * 以下操作能成功吗？
 
@@ -87,7 +87,12 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+x <- c("single", "married", "married", "single")
+x <- factor(x, levels = c("single", "married"))
+x[3] <- "widowed"
+# 解决方案
+x <- factor(x, levels = c("single", "married", "widowed"))
+x[3] <- "widowed"
 ```
 
 ------------------------------------------------------------------------
@@ -100,7 +105,10 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+mon <- c("Mar","Nov","Mar","Aug","Sep","Jun","Nov","Nov","Oct","Jun","May","Sep","Dec","Jul","Nov")
+mon <- factor(mon, levels = c("Jan", "Feb", "Mar",
+  "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+mon
 ```
 
 
