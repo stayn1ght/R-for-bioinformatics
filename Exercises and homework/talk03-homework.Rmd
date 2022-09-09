@@ -110,7 +110,7 @@ df1 <- data.frame(Working = working, row.names = names)
 ## 显示结果
 df1
 ## 显示 Working 列的性质
-class(df1$Working)
+with(df1, class(working))
 
 ```
 
@@ -152,6 +152,7 @@ class(VADeaths)
 df_deaths <- data.frame(VADeaths)
 df_deaths$Total <- rowSums(df_deaths)
 df_deaths <- df_deaths[, c(ncol(df_deaths), 1:(ncol(df_deaths) - 1))]
+df_deaths
 ```
 
 ------------------------------------------------------------------------
@@ -374,7 +375,7 @@ tb
 答：attach()函数将一个数据框绑定到当前的搜索路径中，这样就可以直接使用数据框中的变量名而不用加上数据框的名字。detach()函数将一个数据框从当前的搜索路径中分离出来。
 
 ```{r}
-head(Sepal.Length)
+try(head(Septal.Length))
 # Sepal.Length是iris数据框中的变量名，但是在当前的搜索路径中没有，所以不能直接使用
 attach(iris)
 # attach()函数将iris数据框绑定到当前的搜索路径中，之后就可以直接访问Sepal.Length这个变量了
@@ -421,19 +422,14 @@ data.frame存在部分匹配的问题，而tibble不存在。
 ## 代码写这里，并运行；
 df1 <- data.frame(aaa = 1:6, b = LETTERS[1:6])
 tib1 <- tibble(aaa = 1:6, b = LETTERS[1:6])
-# dataframe子集变成了向量类型而不是data.frame
 df1[, 1]
-# tibble子集仍然是tibble类型
+# dataframe子集变成了向量类型而不是data.frame
 tib1[, 1]
+# tibble子集仍然是tibble类型
 
-# dataframe存在部分匹配的问题
-df1[, "a"]
-# tibble不存在部分匹配的问题
-tib1[, "a"]
-
-# tibble按顺序计算列; dataframe同时计算所有列.
 tibble(a = 1:6, b = a * 2)
-data.frame(a = 1:6, b = a * 2)
+# tibble按顺序计算列; dataframe同时计算所有列.
+try(data.frame(a = 1:6, b = a * 2))
 ```
 
 ## 练习与作业3：IO
@@ -477,10 +473,8 @@ read.table("data/Table6.txt", header = TRUE,
 read.csv("data/states1.csv", header = TRUE)
 
 # states2.csv中 分隔符是 ";"
-stats2 <- read.csv("data/states2.csv", header = TRUE, sep = ";")
-stats2[, 4:7] <- lapply(stats2[, 4:7], gsub,
-    pattern = ",", replacement = "\\.") %>%
-  lapply(as.numeric)
+stats2 <- read.csv("data/states2.csv", header = TRUE, 
+  sep = ";", dec = ",")
 stats2
 
 ## 用readr 包的函数读取，并显示读取的内容；
@@ -519,7 +513,7 @@ read_table("data/Table6.txt", col_names = TRUE, skip = 1,
 read_csv("data/states1.csv", col_names = TRUE)
 
 # 读取 states2.csv . colon转换成点, 使用分号作为分隔符
-read_delim("data/states2.csv", col_names = TRUE, col_types = "ccnnnn",
+read_delim("data/states2.csv", col_names = TRUE,
   locale = locale(decimal_mark = ","), delim = ";")
 ```
 
