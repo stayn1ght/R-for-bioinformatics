@@ -457,7 +457,8 @@ read.table("data/Table1.txt", header = TRUE)
 read.table("data/Table2.txt", header = TRUE, quote = "/", skip = 1)
 read.table("data/Table3.txt", header = TRUE, skip = 1,
   na.strings = c("", "NA", "--", "*", "**"))
-# Table4.txt 身高数据 Height 中的值有逗号需要去掉
+
+# Table4.txt 身高数据 Height 中的值有逗号去掉
 table4 <- read.table("data/Table4.txt", header = TRUE,
   na.strings = c("", "NA", "--", "*", "**"))
 within(table4, Height <- as.numeric(gsub(",", "", Height)))
@@ -466,54 +467,46 @@ table5 <- read.table("data/Table5.txt", header = TRUE, sep = ";",
   na.strings = c("", "NA", "--", "*", "**"))
 table5$Height <- as.numeric(gsub(",", "", table5$Height))
 table5
-# Table6.txt中 @ 为注释符号，需要去掉
 read.table("data/Table6.txt", header = TRUE,
   comment.char = "@", skip = 1)
+# Table6.txt中 @ 为注释符号
 
 read.csv("data/states1.csv", header = TRUE)
 
-# states2.csv中 分隔符是 ";"
-stats2 <- read.csv("data/states2.csv", header = TRUE, 
+
+stats2 <- read.csv("data/states2.csv", header = TRUE,
   sep = ";", dec = ",")
 stats2
 
-## 用readr 包的函数读取，并显示读取的内容；
 if (!require("readr")){ 
   chooseCRANmirror()
   install.packages("readr")
 } 
 library(readr)
-# 读取 Table0.txt 分隔符有空格和制表符
-read_table("data/Table0.txt", col_names = FALSE)
-# 读取 Table1.txt，注意这里的 col_names = TRUE
-read_table("data/Table1.txt", col_names = TRUE)
-# 读取 Table2.txt
-table2 <- read_table("data/Table2.txt", col_names = TRUE, skip = 1)
+## 用readr 包的函数读取，并显示读取的内容；
+read_table("data/Table0.txt", col_names = FALSE, show_col_types = FALSE)
+read_table("data/Table1.txt", col_names = TRUE, show_col_types = FALSE)
+table2 <- read_table("data/Table2.txt", col_names = TRUE, skip = 1, show_col_types = FALSE)
 table2[, c(1,5)] <- lapply(table2[, c(1, 5)],
   gsub, pattern = "/", replacement = "")
 table2
 
-# 读取 Table3.txt
 read_table("data/Table3.txt", col_names = TRUE, skip = 1,
-  na = c("", "NA", "--", "*", "**"))
+  na = c("", "NA", "--", "*", "**"), show_col_types = FALSE)
 
-# 读取 Table4.txt
 read_table("data/Table4.txt", col_names = TRUE,
-  na = c("", "NA", "--", "*", "**"))
+  na = c("", "NA", "--", "*", "**"), show_col_types = FALSE)
 
-# 读取 Table5.txt
 read_delim("data/Table5.txt", col_names = TRUE, delim = ";",
-  na = c("", "NA", "--", "*", "**"))
+  na = c("", "NA", "--", "*", "**"), show_col_types = FALSE)
 
-# 读取 Table6.txt
 read_table("data/Table6.txt", col_names = TRUE, skip = 1,
-  comment = "@")
+  comment = "@", show_col_types = FALSE)
 
-# 读取 states1.csv
-read_csv("data/states1.csv", col_names = TRUE)
+read_csv("data/states1.csv", col_names = TRUE, show_col_types = FALSE)
 
 # 读取 states2.csv . colon转换成点, 使用分号作为分隔符
 read_delim("data/states2.csv", col_names = TRUE,
-  locale = locale(decimal_mark = ","), delim = ";")
+  locale = locale(decimal_mark = ","), delim = ";", show_col_types = FALSE)
 ```
 
