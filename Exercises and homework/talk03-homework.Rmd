@@ -442,7 +442,7 @@ read.table("data/Table5.txt", header = TRUE, sep = ";")
 read.table("data/Table6.txt", header = TRUE, sep = "\t", comment.char = "@", skip = 1)
 
 read.csv("data/states1.csv", header = TRUE)
-# states2.csv中以;分隔
+# states2.csv中 分隔符是 ";"
 read.csv("data/states2.csv", header = TRUE, sep = ";")
 ## 用readr 包的函数读取，并显示读取的内容；
 read_table("data/Table0.txt", col_names = FALSE)
@@ -455,7 +455,7 @@ read_table("data/Table5.txt", col_names = TRUE, sep = ";")
 read_table("data/Table6.txt", col_names = TRUE, sep = "\t", comment = "@", skip = 1)
 
 read_csv("data/states1.csv", col_names = TRUE)
-# states2.csv中以;分隔
+# states2.csv中 分隔符是 ";"
 read_csv("data/states2.csv", col_names = TRUE, sep = ";")
 
 ```
