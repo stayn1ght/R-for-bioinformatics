@@ -83,12 +83,18 @@ Sys.getenv("HOME")
 ![](images/table1.png){width="80%"}
 
 ```{r}
+names <- c("Alex", "Lilly", "Mark", "Oliver", "Martha", "Lucas", "Caroline")
+age <- c(25, 31, 23, 52, 76, 49, 26)
+height <- c(177, 165, 180, 175, 160, 185, 170)
+weight <- c(70, 50, 80, 60, 45, 90, 65)
+sex <- c("F", "F", "M", "M", "F", "M", "F")
 ## 先生成前三列；
-
+df1 <- data.frame(Age = age, Height = height, Weight = weight,
+  row.names = names)
 ## 再插入第四列
-
+df1 <- cbind(df1, sex)
 ## 显示最终结果
-
+df1
 ```
 
 ------------------------------------------------------------------------
@@ -98,11 +104,13 @@ Sys.getenv("HOME")
 ![](images/table2.png){width="80%"}
 
 ```{r}
+working <- c("Yes", "No", "No", "Yes",  "Yes", "No", "Yes")
 ## 生成 data.frame
-
+df1 <- data.frame(Working = working, row.names = names)
 ## 显示结果
-
+df1
 ## 显示 Working 列的性质
+class(df1$Working)
 
 ```
 
@@ -158,11 +166,12 @@ df_deaths <- df_deaths[, c(ncol(df_deaths), 1:(ncol(df_deaths) - 1))]
 
 ```{r}
 ## 代码写这里，并运行；
-swiss[c(1, 2, 3, 10, 11, 12, 13), c("Examination", "Education", "Infant.Mortality")]
-swiss["Sarine", "Infant.Mortality"] <- NA
-swiss
-swiss$Mean <- rowMeans(swiss)
-swiss
+(df_swiss <- swiss[c(1, 2, 3, 10, 11, 12, 13), 
+  c("Examination", "Education", "Infant.Mortality")])
+df_swiss["Sarine", "Infant.Mortality"] <- NA
+df_swiss
+df_swiss$Mean <- rowMeans(df_swiss)
+head(df_swiss)
 ```
 
 ------------------------------------------------------------------------
@@ -242,8 +251,8 @@ M
 
 ```{r}
 ## 代码写这里，并运行；
-M <- M[, -4]
-M
+(M <- M[, -4])
+
 ```
 
 ------------------------------------------------------------------------
@@ -263,7 +272,7 @@ M
     ## 5. 增加一列，其长度是3，可以吗？
     cbind(df3, newcol = 1:3);
 
-答：2. 可以，3. 可以，4. 可以，5. 不可以。
+答：2. 可以，3. 可以，4. 可以，5. 不可以。增加的列的长度必须与原data.frame的行数是整数倍。
 
 ## 练习与作业2，`tibble`
 
@@ -335,7 +344,8 @@ df$y
 tb <- tibble( name = character(), age = integer(), salary = double() );
 
 ##增加三行随机数据；
-tb <- add_row(tb, name = sample(letters, 3), age = sample(50, 3), salary = sample(1000, 3))
+tb <- add_row(tb, name = sample(letters, 3), 
+  age = sample(50, 3), salary = sample(1000, 3))
 tb
 ```
 
@@ -409,7 +419,21 @@ data.frame存在部分匹配的问题，而tibble不存在。
 
 ```{r}
 ## 代码写这里，并运行；
+df1 <- data.frame(aaa = 1:6, b = LETTERS[1:6])
+tib1 <- tibble(aaa = 1:6, b = LETTERS[1:6])
+# dataframe子集变成了向量类型而不是data.frame
+df1[, 1]
+# tibble子集仍然是tibble类型
+tib1[, 1]
 
+# dataframe存在部分匹配的问题
+df1[, "a"]
+# tibble不存在部分匹配的问题
+tib1[, "a"]
+
+# tibble按顺序计算列; dataframe同时计算所有列.
+tibble(a = 1:6, b = a * 2)
+data.frame(a = 1:6, b = a * 2)
 ```
 
 ## 练习与作业3：IO
@@ -434,28 +458,68 @@ data.frame存在部分匹配的问题，而tibble不存在。
 ## 用系统自带函数，并显示读取的内容；
 read.table("data/Table0.txt", header = FALSE)
 read.table("data/Table1.txt", header = TRUE)
-read.table("data/Table2.txt", header = TRUE, sep = "\t", quote = "/", skip = 1)
-read.table("data/Table3.txt", header = TRUE, sep = "\t", skip = 1, na.strings = c("","NA","--","*","**"))
+read.table("data/Table2.txt", header = TRUE, quote = "/", skip = 1)
+read.table("data/Table3.txt", header = TRUE, skip = 1,
+  na.strings = c("", "NA", "--", "*", "**"))
 # Table4.txt 身高数据 Height 中的值有逗号需要去掉
-with(read.table("data/Table4.txt", header = TRUE, sep = "\t", 
-  skip = 1, na.strings = c("","NA","--","*","**")), 
-  Height <- as.numeric(gsub(",", "", Height)))
+table4 <- read.table("data/Table4.txt", header = TRUE,
+  na.strings = c("", "NA", "--", "*", "**"))
+within(table4, Height <- as.numeric(gsub(",", "", Height)))
 
-read.table("data/Table5.txt", header = TRUE, sep = ";", na.strings = c("","NA","--","*","**"))
+table5 <- read.table("data/Table5.txt", header = TRUE, sep = ";",
+  na.strings = c("", "NA", "--", "*", "**"))
+table5$Height <- as.numeric(gsub(",", "", table5$Height))
+table5
 # Table6.txt中 @ 为注释符号，需要去掉
-read.table("data/Table6.txt", header = TRUE, sep = "\t", comment.char = "@", skip = 1)
+read.table("data/Table6.txt", header = TRUE,
+  comment.char = "@", skip = 1)
 
 read.csv("data/states1.csv", header = TRUE)
+
 # states2.csv中 分隔符是 ";"
-read.csv("data/states2.csv", header = TRUE, sep = ";")
+stats2 <- read.csv("data/states2.csv", header = TRUE, sep = ";")
+stats2[, 4:7] <- lapply(stats2[, 4:7], gsub,
+    pattern = ",", replacement = "\\.") %>%
+  lapply(as.numeric)
+stats2
+
 ## 用readr 包的函数读取，并显示读取的内容；
-# 读取 Table0.txt
-read_tsv("data/Table0.txt", col_names = FALSE)
+if (!require("readr")){ 
+  chooseCRANmirror()
+  install.packages("readr")
+} 
+library(readr)
+# 读取 Table0.txt 分隔符有空格和制表符
+read_table("data/Table0.txt", col_names = FALSE)
 # 读取 Table1.txt，注意这里的 col_names = TRUE
-read_tsv("data/Table1.txt", col_names = TRUE)
-# 读取 Table2.txt，字符串引用符号为 /，跳过第一行
+read_table("data/Table1.txt", col_names = TRUE)
+# 读取 Table2.txt
+table2 <- read_table("data/Table2.txt", col_names = TRUE, skip = 1)
+table2[, c(1,5)] <- lapply(table2[, c(1, 5)],
+  gsub, pattern = "/", replacement = "")
+table2
 
+# 读取 Table3.txt
+read_table("data/Table3.txt", col_names = TRUE, skip = 1,
+  na = c("", "NA", "--", "*", "**"))
 
+# 读取 Table4.txt
+read_table("data/Table4.txt", col_names = TRUE,
+  na = c("", "NA", "--", "*", "**"))
 
+# 读取 Table5.txt
+read_delim("data/Table5.txt", col_names = TRUE, delim = ";",
+  na = c("", "NA", "--", "*", "**"))
 
+# 读取 Table6.txt
+read_table("data/Table6.txt", col_names = TRUE, skip = 1,
+  comment = "@")
+
+# 读取 states1.csv
+read_csv("data/states1.csv", col_names = TRUE)
+
+# 读取 states2.csv . colon转换成点, 使用分号作为分隔符
+read_delim("data/states2.csv", col_names = TRUE, col_types = "ccnnnn",
+  locale = locale(decimal_mark = ","), delim = ";")
 ```
+
