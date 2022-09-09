@@ -433,15 +433,29 @@ data.frame存在部分匹配的问题，而tibble不存在。
 ```{r}
 ## 用系统自带函数，并显示读取的内容；
 read.table("data/Table0.txt", header = FALSE)
-read.table("data/Table1.txt", header = FALSE)
-read.table("data/Table2.txt", header = FALSE)
-read.table("data/Table3.txt", header = FALSE)
-read.table("data/Table4.txt", header = FALSE)
-read.table("data/Table5.txt", header = FALSE)
-read.table("data/Table6.txt", header = FALSE)
-read.csv("data/states1.csv", header = FALSE)
-read.csv("data/states2.csv", header = FALSE)
+read.table("data/Table1.txt", header = TRUE)
+read.table("data/Table2.txt", header = TRUE, sep = "\t", quote = "/", skip = 1)
+read.table("data/Table3.txt", header = TRUE, sep = "\t", skip = 1)
+read.table("data/Table4.txt", header = TRUE)
+read.table("data/Table5.txt", header = TRUE, sep = ";")
+# Table6.txt中 @ 为注释符号，需要去掉
+read.table("data/Table6.txt", header = TRUE, sep = "\t", comment.char = "@", skip = 1)
+
+read.csv("data/states1.csv", header = TRUE)
+# states2.csv中以;分隔
+read.csv("data/states2.csv", header = TRUE, sep = ";")
 ## 用readr 包的函数读取，并显示读取的内容；
 read_table("data/Table0.txt", col_names = FALSE)
+read_table("data/Table1.txt", col_names = TRUE)
+read_table("data/Table2.txt", col_names = TRUE, sep = "\t", quote = "/", skip = 1)
+read_table("data/Table3.txt", col_names = TRUE, sep = "\t", skip = 1)
+read_table("data/Table4.txt", col_names = TRUE)
+read_table("data/Table5.txt", col_names = TRUE, sep = ";")
+# Table6.txt中 @ 为注释符号，需要去掉
+read_table("data/Table6.txt", col_names = TRUE, sep = "\t", comment = "@", skip = 1)
+
+read_csv("data/states1.csv", col_names = TRUE)
+# states2.csv中以;分隔
+read_csv("data/states2.csv", col_names = TRUE, sep = ";")
 
 ```
