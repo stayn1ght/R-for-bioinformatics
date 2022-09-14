@@ -64,7 +64,17 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+x <- 1
+y <- 2
+z <- 3
+data <- read.table("data/Table1.txt", header = TRUE)
+save.image(file = "data/MyData.RData")
+ls()
+rm(list = ls())
+load(file = "data/MyData.RData")
+ls()
+rm(list = c("x", "y"))
+ls()
 ```
 
 ## 练习与作业2：Factor基础
@@ -89,7 +99,7 @@ Sys.getenv("HOME")
 ## 代码写这里，并运行；
 x <- c("single", "married", "married", "single")
 x <- factor(x, levels = c("single", "married"))
-x[3] <- "widowed"
+try(x[3] <- "widowed")
 # 解决方案
 x <- factor(x, levels = c("single", "married", "widowed"))
 x[3] <- "widowed"
@@ -123,6 +133,7 @@ mon
 
 ```{r}
 ## 代码写这里，并运行；
+library(forcats)
 
 ```
 
@@ -140,5 +151,37 @@ mon
 
 ```{r}
 ## 代码写这里，并运行；
+library(readr)
+library(ggplot2)
+library(dplyr)
+mouse_genes <- read_tsv("../data/talk04/mouse_genes_biomart_sep2018.txt",
+  col_names = TRUE)
+# 列名中有空格、斜杠和括号 要去掉
+colnames(mouse_genes) <- gsub(" ", "_", colnames(mouse_genes))
+colnames(mouse_genes) <- gsub("/", "_", colnames(mouse_genes))
+colnames(mouse_genes) <- gsub("\\(", "", colnames(mouse_genes))
+colnames(mouse_genes) <- gsub("\\)", "", colnames(mouse_genes))
+autosome_genes <- filter(mouse_genes, Chromosome_scaffold_name != "X" &
+  Chromosome_scaffold_name != "Y", Chromosome_scaffold_name != "MT")
 
+# 按染色体序号排列
+ggplot(autosome_genes, aes(x = Chromosome_scaffold_name, y = Transcript_length_including_UTRs_and_CDS)) +
+  geom_boxplot() + theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# 按每个染色体的基因长度中值排列
+autosome_arrange <- autosome_genes %>%
+  group_by(Chromosome_scaffold_name) %>%
+  mutate(Transcript_length_including_UTRs_and_CDS_median = median(Transcript_length_including_UTRs_and_CDS))
+autosome_arrange <- autosome_arrange[order(autosome_genes$Transcript_length_including_UTRs_and_CDS_median),]
+
+
+ggplot(autosome_genes, aes(x = Chromosome_scaffold_name,
+    y = Transcript_length_including_UTRs_and_CDS)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  # 按中值排序
+  scale_x_discrete(limits = unique(autosome_genes$Chromosome_scaffold_name))
 ```
+
