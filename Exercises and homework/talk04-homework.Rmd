@@ -32,7 +32,7 @@ knit: (
 
 ## Talk04 内容回顾
 
-待写 ... 
+待写 ...
 
 ## 练习与作业：用户验证
 
@@ -45,22 +45,21 @@ Sys.info()[["user"]]
 Sys.getenv("HOME")
 ```
 
-
 ## 练习与作业1：R session管理
 
 ------------------------------------------------------------------------
 
-###   **完成以下操作**
+### **完成以下操作**
 
-* 定义一些变量（比如 x, y , z 并赋值；内容随意）
-* 从外部文件装入一些数据（可自行创建一个4行5列的数据，内容随意）
-* 保存workspace 到.RData
-* 列出当前工作空间内的所有变量
-* 删除当前工作空间内所有变量
-* 从.RData文件恢复保存的数据
-* 再次列出当前工作空间内的所有变量，以确认变量已恢复
-* 随机删除两个变量
-* 再次列出当前工作空间内的所有变量
+-   定义一些变量（比如 x, y , z 并赋值；内容随意）
+-   从外部文件装入一些数据（可自行创建一个4行5列的数据，内容随意）
+-   保存workspace 到.RData
+-   列出当前工作空间内的所有变量
+-   删除当前工作空间内所有变量
+-   从.RData文件恢复保存的数据
+-   再次列出当前工作空间内的所有变量，以确认变量已恢复
+-   随机删除两个变量
+-   再次列出当前工作空间内的所有变量
 
 ```{r}
 ## 代码写这里，并运行；
@@ -68,7 +67,7 @@ x <- 1
 y <- 2
 z <- 3
 data <- read.table("data/Table1.txt", header = TRUE)
-save.image(file = ".RData")
+# save.image(file = ".RData")
 rm(list = ls())
 ls()
 
@@ -82,19 +81,19 @@ ls()
 
 ------------------------------------------------------------------------
 
-###   **factor增加**
+### **factor增加**
 
-* 创建一个变量：
+-   创建一个变量：
 
 `x <- c("single", "married", "married", "single");`
 
-* 为x增加 两个 levels，`single`, `married`;
+-   为x增加 两个 levels，`single`, `married`;
 
-* 以下操作能成功吗？
+-   以下操作能成功吗？
 
 `x[3] <- "widowed"`;
 
-* 如果不，请提供解决方案；
+-   如果不，请提供解决方案；
 
 ```{r}
 ## 代码写这里，并运行；
@@ -109,7 +108,7 @@ x
 
 ------------------------------------------------------------------------
 
-### **利用factor排序**   
+### **利用factor排序**
 
 以下变量包含了几个月份，请使用`factor`，使其能按月份，而不是英文字符串排序：
 
@@ -124,21 +123,19 @@ mon <- factor(mon, levels = c("Jan", "Feb", "Mar",
 sort(mon)
 ```
 
-
 ------------------------------------------------------------------------
 
-### **forcats的问题**   
+### **forcats的问题**
 
 `forcats`包中的 fct_inorder, fct_infreq和 fct_inseq 函数的作用是什么？
 
 请使用`forcats`包中的`gss_cat`数据举例说明
 
-
 ```{r}
 ## 代码写这里，并运行；
 library(forcats)
-gss_cat
-# fct_inorder: 按出现顺序为 levels 排序
+head(gss_cat)
+# fct_inord er: 按出现顺序为 levels 排序
 fct_inorder(gss_cat$marital) %>% levels()
 # fct_infreq: 按出现频率为 levels 排序，出现频率高的拍在前面
 fct_infreq(gss_cat$marital) %>% levels()
@@ -151,22 +148,27 @@ factor(gss_cat$age, levels = 80:20) %>% fct_inseq() %>% levels()
 
 ------------------------------------------------------------------------
 
-### **画图**   
+### **画图**
 
-1. 用 readr 包中的函数读取 mouse genes 文件 （从本课程的 Github 页面下载 data/talk04/ ）
-2. 选取常染色体的基因
-3. 画以下两个基因长度 boxplot :
-  * 按染色体序号排列，比如 1, 2, 3 .... X, Y
-  * 按基因长度 中值 排列，从 短 -> 长 ... 
+1.  用 readr 包中的函数读取 mouse genes 文件 （从本课程的 Github 页面下载 data/talk04/ ）
+2.  选取常染色体的基因
+3.  画以下两个基因长度 boxplot :
+
+-   按染色体序号排列，比如 1, 2, 3 .... X, Y
+-   按基因长度 中值 排列，从 短 -\> 长 ...
 
 ```{r}
 ## 代码写这里，并运行；
+# 不显示 warning 信息 和 message
+options(warn = -1, message = -1)
+
 library(readr)
 library(ggplot2)
 library(dplyr)
+options(warn = 0, message = 0)
 mouse_genes <- read_tsv("../data/talk04/mouse_genes_biomart_sep2018.txt",
-  col_names = TRUE)
-# 列名中有空格、斜杠和括号 要去掉
+  col_names = TRUE, show_col_types = FALSE)
+
 colnames(mouse_genes) <- gsub(" ", "_", colnames(mouse_genes))
 colnames(mouse_genes) <- gsub("/", "_", colnames(mouse_genes))
 colnames(mouse_genes) <- gsub("\\(", "", colnames(mouse_genes))
@@ -174,22 +176,26 @@ colnames(mouse_genes) <- gsub("\\)", "", colnames(mouse_genes))
 autosome_genes <- filter(mouse_genes, Chromosome_scaffold_name %in% 1:19)
 
 # 按染色体序号排列
-
 ggplot(autosome_genes, aes(x = factor(as.numeric(Chromosome_scaffold_name)),
   y = Transcript_length_including_UTRs_and_CDS)) +
-  geom_boxplot() +
+  geom_boxplot(fill = "lightblue") +
   theme_bw() +
-  coord_cartesian(ylim = c(0, 3000)) +
+  coord_cartesian(ylim = c(0, 5000)) +
+  stat_summary(fun = mean, geom = "point", shape = 20,
+    size = 5, color = "green", fill = "green") +
   xlab("Chromosome") +
   ylab("Transcript length (bp)")
-
+  
 
 # 按基因长度 中值 排列，从 短 -> 长
 ggplot(autosome_genes, aes(x = reorder(Chromosome_scaffold_name,
     Transcript_length_including_UTRs_and_CDS, median),
     y = Transcript_length_including_UTRs_and_CDS)) +
-  geom_boxplot() + theme_bw() +
-  coord_cartesian(ylim = c(0, 3000)) +
+  geom_boxplot(fill = "lightblue") +
+  theme_bw() +
+  coord_cartesian(ylim = c(0, 5000)) +
+  stat_summary(fun = mean, geom="point", shape = 20,
+    size = 5, color = "green", fill = "green") +
   xlab("Chromosome") +
   ylab("Transcript length (bp)")
 ```
