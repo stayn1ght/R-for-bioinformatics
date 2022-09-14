@@ -68,10 +68,11 @@ x <- 1
 y <- 2
 z <- 3
 data <- read.table("data/Table1.txt", header = TRUE)
-save.image(file = "data/MyData.RData")
-ls()
+save.image(file = ".RData")
 rm(list = ls())
-load(file = "data/MyData.RData")
+ls()
+
+load(file = ".RData")
 ls()
 rm(list = c("x", "y"))
 ls()
@@ -102,7 +103,8 @@ x <- factor(x, levels = c("single", "married"))
 try(x[3] <- "widowed")
 # 解决方案
 x <- factor(x, levels = c("single", "married", "widowed"))
-x[3] <- "widowed"
+try(x[3] <- "widowed")
+x
 ```
 
 ------------------------------------------------------------------------
@@ -115,10 +117,11 @@ x[3] <- "widowed"
 
 ```{r}
 ## 代码写这里，并运行；
-mon <- c("Mar","Nov","Mar","Aug","Sep","Jun","Nov","Nov","Oct","Jun","May","Sep","Dec","Jul","Nov")
+mon <- c("Mar","Nov","Mar","Aug","Sep","Jun","Nov",
+  "Nov","Oct","Jun","May","Sep","Dec","Jul","Nov")
 mon <- factor(mon, levels = c("Jan", "Feb", "Mar",
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
-mon
+sort(mon)
 ```
 
 
@@ -135,13 +138,13 @@ mon
 ## 代码写这里，并运行；
 library(forcats)
 gss_cat
-# fct_inorder: 按出现顺序排序
+# fct_inorder: 按出现顺序为 levels 排序
 fct_inorder(gss_cat$marital) %>% levels()
-# fct_infreq: 按出现频率排序，出现频率高的拍在前面
+# fct_infreq: 按出现频率为 levels 排序，出现频率高的拍在前面
 fct_infreq(gss_cat$marital) %>% levels()
-# fct_inseq: 按数字顺序排序
-fct_inseq(gss_cat$marital) %>% levels()
-
+# fct_inseq: 根据 level 的数字大小为 levels 排序，要求 factor levels 为数字
+factor(gss_cat$age, levels = 80:20) %>% levels()
+factor(gss_cat$age, levels = 80:20) %>% fct_inseq() %>% levels()
 ```
 
 ## 练习与作业3：用 mouse genes 数据做图
@@ -173,22 +176,21 @@ autosome_genes <- filter(mouse_genes, Chromosome_scaffold_name %in% 1:19)
 # 按染色体序号排列
 
 ggplot(autosome_genes, aes(x = factor(as.numeric(Chromosome_scaffold_name)),
-  y = Transcript_length_including_UTRs_and_CDS)) + 
+  y = Transcript_length_including_UTRs_and_CDS)) +
   geom_boxplot() +
   theme_bw() +
-  # 设置 ylim，x 轴文字，y 轴文字
-  ylim(0, 2500) +
+  coord_cartesian(ylim = c(0, 3000)) +
   xlab("Chromosome") +
   ylab("Transcript length (bp)")
-  
-# 按基因长度 中值 排列
+
+
+# 按基因长度 中值 排列，从 短 -> 长
 ggplot(autosome_genes, aes(x = reorder(Chromosome_scaffold_name,
     Transcript_length_including_UTRs_and_CDS, median),
     y = Transcript_length_including_UTRs_and_CDS)) +
   geom_boxplot() + theme_bw() +
-  ylim(0, 2500) +
+  coord_cartesian(ylim = c(0, 3000)) +
   xlab("Chromosome") +
-  ylab("Transcript length (bp)") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  ylab("Transcript length (bp)")
 ```
 
