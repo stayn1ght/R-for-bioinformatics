@@ -134,6 +134,13 @@ mon
 ```{r}
 ## 代码写这里，并运行；
 library(forcats)
+gss_cat
+# fct_inorder: 按出现顺序排序
+fct_inorder(gss_cat$marital) %>% levels()
+# fct_infreq: 按出现频率排序，出现频率高的拍在前面
+fct_infreq(gss_cat$marital) %>% levels()
+# fct_inseq: 按数字顺序排序
+fct_inseq(gss_cat$marital) %>% levels()
 
 ```
 
@@ -161,27 +168,27 @@ colnames(mouse_genes) <- gsub(" ", "_", colnames(mouse_genes))
 colnames(mouse_genes) <- gsub("/", "_", colnames(mouse_genes))
 colnames(mouse_genes) <- gsub("\\(", "", colnames(mouse_genes))
 colnames(mouse_genes) <- gsub("\\)", "", colnames(mouse_genes))
-autosome_genes <- filter(mouse_genes, Chromosome_scaffold_name != "X" &
-  Chromosome_scaffold_name != "Y", Chromosome_scaffold_name != "MT")
+autosome_genes <- filter(mouse_genes, Chromosome_scaffold_name %in% 1:19)
 
 # 按染色体序号排列
-ggplot(autosome_genes, aes(x = Chromosome_scaffold_name, y = Transcript_length_including_UTRs_and_CDS)) +
-  geom_boxplot() + theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# 按每个染色体的基因长度中值排列
-autosome_arrange <- autosome_genes %>%
-  group_by(Chromosome_scaffold_name) %>%
-  mutate(Transcript_length_including_UTRs_and_CDS_median = median(Transcript_length_including_UTRs_and_CDS))
-autosome_arrange <- autosome_arrange[order(autosome_genes$Transcript_length_including_UTRs_and_CDS_median),]
-
-
-ggplot(autosome_genes, aes(x = Chromosome_scaffold_name,
-    y = Transcript_length_including_UTRs_and_CDS)) +
+ggplot(autosome_genes, aes(x = factor(as.numeric(Chromosome_scaffold_name)),
+  y = Transcript_length_including_UTRs_and_CDS)) + 
   geom_boxplot() +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  # 按中值排序
-  scale_x_discrete(limits = unique(autosome_genes$Chromosome_scaffold_name))
+  # 设置 ylim，x 轴文字，y 轴文字
+  ylim(0, 2500) +
+  xlab("Chromosome") +
+  ylab("Transcript length (bp)")
+  
+# 按基因长度 中值 排列
+ggplot(autosome_genes, aes(x = reorder(Chromosome_scaffold_name,
+    Transcript_length_including_UTRs_and_CDS, median),
+    y = Transcript_length_including_UTRs_and_CDS)) +
+  geom_boxplot() + theme_bw() +
+  ylim(0, 2500) +
+  xlab("Chromosome") +
+  ylab("Transcript length (bp)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
