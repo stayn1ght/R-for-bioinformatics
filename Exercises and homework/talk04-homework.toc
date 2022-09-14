@@ -1,0 +1,11 @@
+\contentsline {subsection}{\numberline {0.1}练习和作业说明}{1}{subsection.0.1}%
+\contentsline {subsection}{\numberline {0.2}Talk04 内容回顾}{1}{subsection.0.2}%
+\contentsline {subsection}{\numberline {0.3}练习与作业：用户验证}{1}{subsection.0.3}%
+\contentsline {subsection}{\numberline {0.4}练习与作业1：R session管理}{2}{subsection.0.4}%
+\contentsline {subsubsection}{\numberline {0.4.1}\textbf {完成以下操作}}{2}{subsubsection.0.4.1}%
+\contentsline {subsection}{\numberline {0.5}练习与作业2：Factor基础}{3}{subsection.0.5}%
+\contentsline {subsubsection}{\numberline {0.5.1}\textbf {factor增加}}{3}{subsubsection.0.5.1}%
+\contentsline {subsubsection}{\numberline {0.5.2}\textbf {利用factor排序}}{4}{subsubsection.0.5.2}%
+\contentsline {subsubsection}{\numberline {0.5.3}\textbf {forcats的问题}}{4}{subsubsection.0.5.3}%
+\contentsline {subsection}{\numberline {0.6}练习与作业3：用 mouse genes 数据做图}{679}{subsection.0.6}%
+\contentsline {subsubsection}{\numberline {0.6.1}\textbf {画图}}{679}{subsubsection.0.6.1}%
