@@ -119,12 +119,16 @@ x
 
 ```{r}
 ## 代码写这里，并运行；
-
+v <- c("a", "b", "a", "c", "b")
+v <- factor(v)
+v
+levels(v)[1] <- "d"
+v
 ```
 
 * 比较改变前后的 `v` 的内容，改变levels 的操作使 `v` 发生了什么变化？
 
-答：
+答：改变levels的操作使v的内容发生了变化，将原来的"a"改为了"d"。
 
 ### **factors合并**
 
@@ -134,7 +138,11 @@ x
 
 ```{r}
 ## 代码写这里，并运行；
-
+x <- factor(sample(LETTERS, 10, replace = TRUE))
+y <- factor(sample(LETTERS, 10, replace = TRUE))
+x
+y
+c(x, y)
 ```
 
 ------------------------------------------------------------------------
@@ -171,8 +179,8 @@ fct_inorder(gss_cat$marital) %>% levels()
 # fct_infreq: 按出现频率为 levels 排序，出现频率高的拍在前面
 fct_infreq(gss_cat$marital) %>% levels()
 # fct_inseq: 根据 level 的数字大小为 levels 排序，要求 factor levels 为数字
-factor(gss_cat$age, levels = 80:20) %>% levels()
-factor(gss_cat$age, levels = 80:20) %>% fct_inseq() %>% levels()
+factor(gss_cat$age, levels = 80:60) %>% levels()
+factor(gss_cat$age, levels = 80:60) %>% fct_inseq() %>% levels()
 ```
 
 ## 练习与作业3：用 mouse genes 数据做图

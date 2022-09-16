@@ -71,6 +71,12 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
+abu <- 
+  read_delim(
+    file = "../data/talk06/relative_abundance_for_RUN_ERR1072629_taxonlevel_species.txt",
+    delim = "\t", quote = "", comment = "#")
+# 取丰度最高的 5 个菌，相对丰度相加并归为一类 Qita
+
 
 ```
 

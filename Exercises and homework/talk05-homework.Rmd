@@ -58,7 +58,14 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
+mouse.tibble <- read_delim( file = "data/talk04/mouse_genes_biomart_sep2018.txt", 
+    delim = "\t", quote = "" ) 
+mouse.tibble %>%
+    group_by(Chromosome/scaffold name, Gene type) %>%
+    summarise( count = n(), 
+        mean_length = mean( `Transcript length (including UTRs and CDS)` ), 
+        min_length = min( `Transcript length (including UTRs and CDS)` ), 
+        max_length = max( `Transcript length (including UTRs and CDS)` ) ) 
 ```
 
 ------------------------------------------------------------------------
@@ -86,7 +93,25 @@ grades <- tibble( "Name" = c("Weihua Chen", "Mm Hu", "John Doe", "Jane Doe",
 
 ```{r}
 ## 代码写这里，并运行；
-
+grades <- tibble( "Name" = c("Weihua Chen", "Mm Hu", "John Doe", "Jane Doe",
+                             "Warren Buffet", "Elon Musk", "Jack Ma"),
+                  "Occupation" = c("Teacher", "Student", "Teacher", "Student", 
+                                   rep( "Entrepreneur", 3 ) ),
+                  "English" = sample( 60:100, 7 ),
+                  "ComputerScience" = sample(80:90, 7),
+                  "Biology" = sample( 50:100, 7),
+                  "Bioinformatics" = sample( 40:90, 7)
+                  );
+mutate(grades, min_score = min(English, ComputerScience, Biology, Bioinformatics),
+       min_subject = ifelse(English == min_score, "English",
+                            ifelse(ComputerScience == min_score, "ComputerScience",
+                                   ifelse(Biology == min_score, "Biology", "Bioinformatics")))) %>%
+    group_by(Occupation) %>%
+    summarise( avg_score = mean(English, ComputerScience, Biology, Bioinformatics),
+               best_subject = ifelse(avg_score == max(avg_score), "English",
+                                     ifelse(avg_score == max(avg_score), "ComputerScience",
+                                            ifelse(avg_score == max(avg_score), "Biology", "Bioinformatics")))) %>%
+    arrange(desc(avg_score)) 
 ```
 
 
@@ -97,9 +122,13 @@ grades <- tibble( "Name" = c("Weihua Chen", "Mm Hu", "John Doe", "Jane Doe",
 1. 计算每个人的 BMI；
 2. 挑选出 肥胖（BMI >= 30）的人类，并且只显示其 `name`, `sex` 和 `homeworld`；
 
+
 ```{r}
 ## 代码写这里，并运行；
-
+data(starwars)
+mutate(starwars, BMI = mass/(height/100)^2)
+filter(starwars, BMI >= 30) %>%
+  select(name, sex, homeworld)
 ```
 
 3. 挑选出所有人类；
@@ -108,6 +137,20 @@ grades <- tibble( "Name" = c("Weihua Chen", "Mm Hu", "John Doe", "Jane Doe",
 
 ```{r}
 ## 代码写这里，并运行；
+filter(starwars, species = Human) %>%
+    mutate(BMI = mass/(height/100)^2) %>%
+    mutate(BMI_group = ifelse(BMI < 18, "Underweight",
+                              ifelse(BMI < 25, "Normal",
+                                     ifelse(BMI < 30, "Overweight", "Obese")))) %>%
+    group_by(BMI_group) %>%
+    summarise(count = n()) %>%
+    ggplot(aes(x = BMI_group, y = count)) +
+    geom_bar(stat = "identity") +
+    scale_x_discrete(limits = c("Underweight", "Normal", "Overweight", "Obese")) +
+    labs(x = "BMI Group", y = "Count") +
+    theme_bw()
+
+
 
 ```
 
