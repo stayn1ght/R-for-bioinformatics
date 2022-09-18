@@ -217,25 +217,51 @@ autosome_genes <- filter(mouse_genes, Chromosome_scaffold_name %in% 1:19)
 # 按染色体序号排列
 ggplot(autosome_genes, aes(x = factor(as.numeric(Chromosome_scaffold_name)),
   y = Transcript_length_including_UTRs_and_CDS)) +
-  geom_boxplot(fill = "lightblue") +
-  theme_bw() +
-  coord_cartesian(ylim = c(0, 5000)) +
+  stat_boxplot(geom = "errorbar", width = 0.3, lwd = 1, color = "lightblue") +
+  geom_boxplot(width = 0.5, lwd = 1, color = "lightblue") +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.background = element_blank(),
+    panel.border = element_blank(),
+    axis.line = element_line(color = "black", size = 0.5),
+    axis.ticks = element_line(color = "black", size = 0.5),
+    axis.text.x = element_text(size = 10, color = "black"),
+    axis.text.y = element_text(size = 10, color = "black"),
+    axis.title.x = element_text(size = 12, color = "black"),
+    axis.title.y = element_text(size = 12, color = "black"),
+    legend.position = "none") +
+  coord_cartesian(ylim = c(0, 6000)) +
   stat_summary(fun = mean, geom = "point", shape = 20,
-    size = 5, color = "green", fill = "green") +
+    size = 5, color = "lightgreen", fill = "lightgreen") +
   xlab("Chromosome") +
   ylab("Transcript length (bp)")
-  
 
 # 按基因长度 中值 排列，从 短 -> 长
 ggplot(autosome_genes, aes(x = reorder(Chromosome_scaffold_name,
     Transcript_length_including_UTRs_and_CDS, median),
     y = Transcript_length_including_UTRs_and_CDS)) +
-  geom_boxplot(fill = "lightblue") +
-  theme_bw() +
-  coord_cartesian(ylim = c(0, 5000)) +
-  stat_summary(fun = mean, geom="point", shape = 20,
-    size = 5, color = "green", fill = "green") +
+  stat_boxplot(geom = "errorbar", width = 0.3, lwd = 1, color = "lightblue") +
+  geom_boxplot(width = 0.5, lwd = 1, color = "lightblue") +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.background = element_blank(),
+    panel.border = element_blank(),
+    axis.line = element_line(color = "black", size = 0.5),
+    axis.ticks = element_line(color = "black", size = 0.5),
+    axis.text.x = element_text(size = 10, color = "black"),
+    axis.text.y = element_text(size = 10, color = "black"),
+    axis.title.x = element_text(size = 12, color = "black"),
+    axis.title.y = element_text(size = 12, color = "black"),
+    legend.position = "none") +
+  coord_cartesian(ylim = c(0, 6000)) +
+  stat_summary(fun = mean, geom = "point", shape = 20,
+    size = 5, color = "lightgreen", fill = "lightgreen") +
   xlab("Chromosome") +
   ylab("Transcript length (bp)")
 ```
-
