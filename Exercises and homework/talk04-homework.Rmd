@@ -211,10 +211,12 @@ colnames(mouse_genes) <- gsub(" ", "_", colnames(mouse_genes))
 colnames(mouse_genes) <- gsub("/", "_", colnames(mouse_genes))
 colnames(mouse_genes) <- gsub("\\(", "", colnames(mouse_genes))
 colnames(mouse_genes) <- gsub("\\)", "", colnames(mouse_genes))
-autosome_genes <- filter(mouse_genes, Chromosome_scaffold_name %in% 1:19)
+autosome_genes <- filter(mouse_genes,
+  Chromosome_scaffold_name %in% c(1:19, "X", "Y"))
 
 # 按染色体序号排列
-ggplot(autosome_genes, aes(x = factor(as.numeric(Chromosome_scaffold_name)),
+ggplot(autosome_genes,
+  aes(x = factor(Chromosome_scaffold_name, levels = c(1:19, "X", "Y")),
   y = Transcript_length_including_UTRs_and_CDS)) +
   stat_boxplot(geom = "errorbar", width = 0.3, lwd = 1, color = "lightblue") +
   geom_boxplot(width = 0.5, lwd = 1, color = "lightblue") +
