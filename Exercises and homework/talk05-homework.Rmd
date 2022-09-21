@@ -61,7 +61,7 @@ Sys.getenv("HOME")
 mouse.tibble <- read_delim( file = "data/talk04/mouse_genes_biomart_sep2018.txt", 
     delim = "\t", quote = "" ) 
 mouse.tibble %>%
-    group_by(Chromosome/scaffold name, Gene type) %>%
+    group_by(`Chromosome/scaffold name, Gene type`) %>%
     summarise( count = n(), 
         mean_length = mean( `Transcript length (including UTRs and CDS)` ), 
         min_length = min( `Transcript length (including UTRs and CDS)` ), 
