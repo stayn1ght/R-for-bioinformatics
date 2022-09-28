@@ -244,6 +244,7 @@ c("chen wei hua", "chen wei", "chen") %>% str_subset( "wei\\b" );
 
 ```{r}
 ## 
+"1234abc" %>% str_extract_all( "\\d" );
 "1234abc" %>% str_extract( "\\d+" );
 "1234abc" %>% str_extract( "\\d{3}" );
 "1234abc" %>% str_extract( "\\d{5,6}" );
