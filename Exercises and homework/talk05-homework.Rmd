@@ -62,14 +62,36 @@ options(warn = -1)
 library(readr)
 library(dplyr)
 library(reshape2)
-mouse.tibble <- read_delim( file = "data/talk04/mouse_genes_biomart_sep2018.txt", 
-    delim = "\t", quote = "" ) 
-mouse.tibble %>%
-    group_by(`Chromosome/scaffold name, Gene type`) %>%
+options(warn = 0)
+# mouse.tibble <- read_delim( file = "data/talk04/mouse_genes_biomart_sep2018.txt", 
+    # delim = "\t", quote = "" ) 
+# 每个染色体（或scaffold）上每种基因类型的数量、平均长度、最大和最小长度
+summary.mouse <- mouse.tibble %>%
+    group_by(`Chromosome/scaffold name`, `Transcript type`) %>%
     summarise( count = n(), 
         mean_length = mean( `Transcript length (including UTRs and CDS)` ), 
         min_length = min( `Transcript length (including UTRs and CDS)` ), 
         max_length = max( `Transcript length (including UTRs and CDS)` ) ) 
+# 挑出最长和最短的基因
+longest.gene <- mouse.tibble %>%
+    group_by(`Chromosome/scaffold name`) %>%
+    top_n(1, `Transcript length (including UTRs and CDS)`) %>%
+    ungroup() %>%
+    select(`Chromosome/scaffold name`, `Transcript type`, 
+        `Transcript length (including UTRs and CDS)`)
+shortest.gene <- mouse.tibble %>%
+    group_by(`Chromosome/scaffold name`) %>%
+    top_n(-1, `Transcript length (including UTRs and CDS)`) %>%
+    ungroup() %>%
+    select(`Chromosome/scaffold name`, `Transcript type`, 
+        `Transcript length (including UTRs and CDS)`)
+# 去掉含有500以下基因的染色体（或scaffold），按染色体（或scaffold）、数量 高 -\> 低 进行排序
+summary.temp <- mouse.tibble %>%
+    group_by(`Chromosome/scaffold name`) %>%
+    summarise( count = n() ) %>%
+    filter( count > 500 ) %>%
+    arrange( desc(count) )
+
 ```
 
 ------------------------------------------------------------------------
