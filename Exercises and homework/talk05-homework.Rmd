@@ -59,12 +59,11 @@ Sys.getenv("HOME")
 ```{r}
 ## 代码写这里，并运行；
 options(warn = -1)
-library(readr)
-library(dplyr)
-library(reshape2)
+library("tidyverse")
+library("reshape2")
 options(warn = 0)
 # mouse.tibble <- read_delim( file = "data/talk04/mouse_genes_biomart_sep2018.txt", 
-    # delim = "\t", quote = "" ) 
+#     delim = "\t", quote = "" ) 
 # 每个染色体（或scaffold）上每种基因类型的数量、平均长度、最大和最小长度
 summary.mouse <- mouse.tibble %>%
     group_by(`Chromosome/scaffold name`, `Transcript type`) %>%
@@ -107,31 +106,29 @@ summary.temp <- mouse.tibble %>%
 
 ```{r}
 ## 代码写这里，并运行；
-grades <- tibble( "Name" = c("Weihua Chen", "Mm Hu", "John Doe", "Jane Doe",
-                             "Warren Buffet", "Elon Musk", "Jack Ma"),
-                  "Occupation" = c("Teacher", "Student", "Teacher", "Student", 
-                                   rep( "Entrepreneur", 3 ) ),
-                  "English" = sample( 60:100, 7 ),
-                  "ComputerScience" = sample(80:90, 7),
-                  "Biology" = sample( 50:100, 7),
-                  "Bioinformatics" = sample( 40:90, 7)
-                  );
-mutate(grades, min_score = min(English, ComputerScience, Biology, Bioinformatics),
-       min_subject = ifelse(English == min_score, "English",
-                            ifelse(ComputerScience == min_score, "ComputerScience",
-                                   ifelse(Biology == min_score, "Biology", "Bioinformatics")))) %>%
-    group_by(Occupation) %>%
-    summarise( avg_score = mean(English, ComputerScience, Biology, Bioinformatics),
-               best_subject = ifelse(avg_score == max(avg_score), "English",
-                                     ifelse(avg_score == max(avg_score), "ComputerScience",
-                                            ifelse(avg_score == max(avg_score), "Biology", "Bioinformatics")))) %>%
-    arrange(desc(avg_score)) 
+grades <- read_tsv(file = "data/talk05/grades.txt")
+grades.spread <- spread(grades, key = `course`, value = `grade`)
+grades.gather <- gather(grades.spread, key = `course`,
+  value = `grade`, -name) %>%
+  filter(!is.na(`grade`)) %>%
+  arrange(desc(name))
+grades.spread
+grades.gather
+
 ```
 
 3. 研究并使用 `tidyr`包里的 `pivot_longer` 和 `pivot_wider` 函数对 `grades` 变量进行宽长转换；
 
 ```{r}
 ## 代码写这里，并运行；
+grades.pivot_wider <- pivot_wider(grades, names_from = "course",
+  values_from = "grade")
+grades.pivot_longer <- pivot_longer(grades.pivot_wider, cols = 2:6,
+  names_to = "course", values_to = "grade", 
+  # 去掉带 na 的行
+  values_drop_na = TRUE)
+grades.pivot_wider
+grades.pivot_longer
 
 ```
 
@@ -139,7 +136,9 @@ mutate(grades, min_score = min(English, ComputerScience, Biology, Bioinformatics
 
 ```{r}
 ## 代码写这里，并运行；
-
+message("使用 values_drop_na = TRUE 参数去除带 na 的行")
+pivot_longer(grades.pivot_wider, cols = 2:6,
+  names_to = "course", values_to = "grade", values_drop_na = TRUE)
 ```
 
 
@@ -147,7 +146,8 @@ mutate(grades, min_score = min(English, ComputerScience, Biology, Bioinformatics
 
 ` grades %>% complete( name, course ) `
 
-答：
+答： `complete` 函数用于填充缺失值，这里是填充 `name` 和 `course` 的缺失值，
+    使得每个 `name` 和 `course` 都有一个 grade 值。
 
 
 ------------------------------------------------------------------------
@@ -171,10 +171,7 @@ mutate(grades, min_score = min(English, ComputerScience, Biology, Bioinformatics
 
 ```{r}
 ## 代码写这里，并运行；
-data(starwars)
-mutate(starwars, BMI = mass/(height/100)^2)
-filter(starwars, BMI >= 30) %>%
-  select(name, sex, homeworld)
+
 ```
 
 ------------------------------------------------------------------------
@@ -186,20 +183,10 @@ filter(starwars, BMI >= 30) %>%
 
 ```{r}
 ## 代码写这里，并运行；
-filter(starwars, species = Human) %>%
-    mutate(BMI = mass/(height/100)^2) %>%
-    mutate(BMI_group = ifelse(BMI < 18, "Underweight",
-                              ifelse(BMI < 25, "Normal",
-                                     ifelse(BMI < 30, "Overweight", "Obese")))) %>%
-    group_by(BMI_group) %>%
-    summarise(count = n()) %>%
-    ggplot(aes(x = BMI_group, y = count)) +
-    geom_bar(stat = "identity") +
-    scale_x_discrete(limits = c("Underweight", "Normal", "Overweight", "Obese")) +
-    labs(x = "BMI Group", y = "Count") +
-    theme_bw()
-
-
+mutate(starwars, BMI = mass/(height/100)^2)
+mutate(starwars, BMI = mass/(height/100)^2) %>%
+  filter(BMI >= 30) %>%
+  select(name, sex, homeworld)
 
 ```
 
@@ -209,17 +196,44 @@ filter(starwars, species = Human) %>%
 
 ```{r}
 ## 代码写这里，并运行；
+human_bmi <- filter(starwars, species == "Human") %>%
+    mutate(BMI = mass/(height/100)^2) %>%
+    mutate(BMI_group = ifelse(BMI < 18, "Underweight",
+                        ifelse(BMI < 25, "Normal",
+                        ifelse(BMI < 30, "Overweight", "Obese")))) %>%
+    group_by(BMI_group) %>%
+    summarise(count = n())
+
+human_bmi %>%
+    filter(!is.na(BMI_group)) %>%
+    ggplot(aes(x = factor(BMI_group, levels = c("Underweight", "Normal", "Overweight", "Obese")),
+               y = count)) + 
+    geom_bar(stat = "identity") +
+    labs(x = "BMI Group", y = "Count")
+
+# human_bmi 中的 BMI_group 按照相应的 count 重新设定 levels
+human_bmi %>%
+    filter(!is.na(BMI_group)) %>%
+    ggplot(aes(x = factor(BMI_group, levels = human_bmi$BMI_group[order(human_bmi$count)]),
+               y = count)) + 
+    geom_bar(stat = "identity") +
+    labs(x = "BMI Group", y = "Count")
 
 ```
 
 6.  查看 `starwars` 的 `films` 列，它有什么特点？`data.frame`可以实现类似的功能吗？
 
-答：
+答： 
+    
 
 7.  为`starwars`增加一列，用于统计每个角色在多少部电影中出现。
 
 ```{r}
 ## 代码写这里，并运行；
+starwars %>%
+    group_by(name) %>%
+    # 保持所有列不变，增加一列 nr_films
+    mutate(nr_films = length(films))
 
 ```
 
@@ -231,6 +245,9 @@ filter(starwars, species = Human) %>%
 
 ```{r}
 ## 代码写这里，并运行；
+Theoph <- tibble(Theoph)
+# 选取从 Subject 到 Dose 的列
+select(Theoph, Subject:Dose)
 
 ```
 
