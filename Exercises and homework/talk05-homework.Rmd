@@ -72,10 +72,10 @@ mouse_tibble <- read_delim("data/talk04/mouse_genes_biomart_sep2018.txt",
 # 挑出最长和最短的基因
 longest_gene <- mouse_tibble %>%
     group_by(`Chromosome/scaffold name`, `Transcript type`) %>%
-    summarise( count = n(), 
-        mean_length = mean( `Transcript length (including UTRs and CDS)` ), 
-        min_length = min( `Transcript length (including UTRs and CDS)` ), 
-        max_length = max( `Transcript length (including UTRs and CDS)` ) ) 
+    summarise(count = n(),
+        mean_length = mean(`Transcript length (including UTRs and CDS)`),
+        min_length = min(`Transcript length (including UTRs and CDS)`),
+        max_length = max(`Transcript length (including UTRs and CDS)`))
 # 挑出最长和最短的基因
 longest_gene <- mouse_tibble %>%
     group_by(`Chromosome/scaffold name`) %>%
