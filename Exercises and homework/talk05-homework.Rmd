@@ -127,7 +127,7 @@ summary_mouse
 ## 代码写这里，并运行；
 grades <- read_tsv(file = "data/talk05/grades.txt")
 grades_spread <- spread(grades, key = `course`, value = `grade`)
-grades_gather <- gather(grades.spread, key = `course`,
+grades_gather <- gather(grades_spread, key = `course`,
   value = `grade`, -name) %>%
   filter(!is.na(`grade`)) %>%
   arrange(desc(name))
@@ -143,7 +143,7 @@ grades_gather
 grades.pivot_wider <- pivot_wider(grades, names_from = "course",
   values_from = "grade")
 grades.pivot_longer <- pivot_longer(grades.pivot_wider, cols = 2:6,
-  names_to = "course", values_to = "grade", 
+  names_to = "course", values_to = "grade",
   # 去掉带 na 的行
   values_drop_na = TRUE)
 grades.pivot_wider
@@ -158,6 +158,7 @@ grades.pivot_longer
 message("使用 values_drop_na = TRUE 参数去除带 na 的行")
 pivot_longer(grades.pivot_wider, cols = 2:6,
   names_to = "course", values_to = "grade", values_drop_na = TRUE)
+
 ```
 
 5.  以下代码有什么作用？
@@ -189,6 +190,40 @@ pivot_longer(grades.pivot_wider, cols = 2:6,
 
 ```{r}
 ## 代码写这里，并运行；
+grades2 <- tibble("Name" = c("Weihua Chen", "Mm Hu", "John Doe", "Jane Doe",
+    "Warren Buffet", "Elon Musk", "Jack Ma"),
+  "Occupation" = c("Teacher", "Student", "Teacher", "Student",
+    rep("Entrepreneur", 3)),
+  "English" = sample(60:100, 7),
+  "ComputerScience" = sample(80:90, 7),
+  "Biology" = sample(50:100, 7),
+  "Bioinformatics" = sample(40:90, 7)
+)
+# 1. 每个人最差的学科和成绩分别是什么？
+grades2 %>%
+  gather(key = "course", value = "grade", -Name, -Occupation) %>%
+  group_by(Name) %>%
+  summarise(min_grade = min(grade)) %>%
+  arrange(Name) %>%
+  mutate(course = case_when(
+    min_grade == English ~ "English",
+    min_grade == ComputerScience ~ "ComputerScience",
+    min_grade == Biology ~ "Biology",
+    min_grade == Bioinformatics ~ "Bioinformatics"
+  )) %>%
+  select(Name, course, min_grade)
+# 2. 哪个职业的平均成绩最好？
+grades2 %>%
+  gather(key = "course", value = "grade", -Name, -Occupation) %>%
+  group_by(Occupation) %>%
+  summarise(avg_grade = mean(grade)) %>%
+  arrange(desc(avg_grade))
+# 3. 每个职业的最佳学科分别是什么（按平均分排序）？？？
+grades2 %>%
+  gather(key = "course", value = "grade", -Name, -Occupation) %>%
+  group_by(Occupation, course) %>%
+  summarise(avg_grade = mean(grade)) %>%
+  arrange(Occupation, desc(avg_grade))
 
 ```
 

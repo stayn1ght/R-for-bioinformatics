@@ -305,6 +305,10 @@ mtcars %>% group_by( cyl );
 
 ```{r eval=FALSE}
 mtcars %>% split( .$cyl ) %>% map( ~ cor.test( .$wt, .$mpg ) ) %>% map_dbl( ~.$estimate );
+# 最后一步 map_dbl( ~.$estimate ) 的意思是：
+# 1. 从 map 返回的 list 中取出每个元素
+# 2. 对每个元素取出 estimate 值
+```
 ```
 
 \FontNormal 
