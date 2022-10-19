@@ -204,20 +204,23 @@ grades2 %>%
   gather(key = "course", value = "grade", -Name, -Occupation) %>%
   group_by(Name) %>%
   summarise(min_grade = min(grade)) %>%
-  arrange(Name) %>%
-  mutate(course = case_when(
-    min_grade == English ~ "English",
-    min_grade == ComputerScience ~ "ComputerScience",
-    min_grade == Biology ~ "Biology",
-    min_grade == Bioinformatics ~ "Bioinformatics"
-  )) %>%
-  select(Name, course, min_grade)
+  # 每个人成绩最差的学科
+  left_join(grades2, by = c("Name")) %>%
+  melt(id.vars = c("Name", "min_grade", "Occupation")) %>%
+  tibble() %>%
+  rename(course = variable, grade = value) %>%
+  filter(grade == min_grade) %>%
+  select(Name, poor_course = course, grade) %>%
+  arrange(Name)
+
+
 # 2. 哪个职业的平均成绩最好？
 grades2 %>%
   gather(key = "course", value = "grade", -Name, -Occupation) %>%
   group_by(Occupation) %>%
   summarise(avg_grade = mean(grade)) %>%
   arrange(desc(avg_grade))
+
 # 3. 每个职业的最佳学科分别是什么（按平均分排序）？？？
 grades2 %>%
   gather(key = "course", value = "grade", -Name, -Occupation) %>%
@@ -236,8 +239,8 @@ grades2 %>%
 
 ```{r}
 ## 代码写这里，并运行；
-mutate(starwars, BMI = mass/(height/100)^2)
-mutate(starwars, BMI = mass/(height/100)^2) %>%
+mutate(starwars, BMI = mass / (height / 100)^2)
+mutate(starwars, BMI = mass / (height / 100)^2) %>%
   filter(BMI >= 30) %>%
   select(name, sex, homeworld)
 
@@ -280,7 +283,7 @@ human_bmi %>%
     
 
 7.  为`starwars`增加一列，用于统计每个角色在多少部电影中出现。
-
+  
 ```{r}
 ## 代码写这里，并运行；
 starwars %>%
