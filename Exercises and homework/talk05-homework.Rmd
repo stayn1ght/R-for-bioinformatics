@@ -276,7 +276,7 @@ human_bmi %>%
 
 6.  查看 `starwars` 的 `films` 列，它有什么特点？`data.frame`可以实现类似的功能吗？
 
-答： 
+答： films 列的每个元素是一个包含多个元素的列表，data.frame 不能实现类似的功能。
     
 
 7.  为`starwars`增加一列，用于统计每个角色在多少部电影中出现。
@@ -284,10 +284,9 @@ human_bmi %>%
 ```{r}
 ## 代码写这里，并运行；
 starwars %>%
-    group_by(name) %>%
     # 保持所有列不变，增加一列 nr_films
-    mutate(nr_films = length(films))
-
+    mutate(nr_films = map_int(films, length))
+    
 ```
 
 ### **使用`Theoph`变量做练习**
@@ -302,12 +301,17 @@ Theoph <- tibble(Theoph)
 # 选取从 Subject 到 Dose 的列
 select(Theoph, Subject:Dose)
 
+colnums <- select(Theoph, Subject:Dose) %>% ncol()
+message("总共有", colnums, "列")
+
 ```
 
 2. 用`filter` 选取 `Dose` 大于5，且 `Time` 高于 `Time` 列平均值的行；
 
 ```{r}
 ## 代码写这里，并运行；
+Theoph %>%
+    filter(Dose > 5, Time > mean(Time))
 
 ```
 
@@ -315,6 +319,9 @@ select(Theoph, Subject:Dose)
 
 ```{r}
 ## 代码写这里，并运行；
+Theoph %>%
+    mutate(trend = Time - mean(Time, na.rm = TRUE)) %>%
+    filter(!is.na(trend))
 
 ```
 
@@ -325,4 +332,11 @@ select(Theoph, Subject:Dose)
 * 如果 `Wt` > 66.68，为 'Light-middleweight'
 * 其它值，为 'Welterweight'
 
+```{r}
+## 代码写这里，并运行；
+Theoph %>%
+    mutate(weight_cat = ifelse(Wt > 76.2, "Super-middleweight",
+                        ifelse(Wt > 72.57, "Middleweight",
+                        ifelse(Wt > 66.68, "Light-middleweight", "Welterweight"))))
 
+```

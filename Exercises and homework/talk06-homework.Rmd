@@ -76,7 +76,8 @@ abu <-
     file = "../data/talk06/relative_abundance_for_RUN_ERR1072629_taxonlevel_species.txt",
     delim = "\t", quote = "", comment = "#")
 # 取丰度最高的 5 个菌，相对丰度相加并归为一类 Qita
-
+abu %>%
+  arrange(desc(Relative_Abundance)) %>%
 
 ```
 
