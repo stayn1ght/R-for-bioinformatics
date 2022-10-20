@@ -10,6 +10,7 @@ output:
   word_document: default
   html_document:
     df_print: paged
+
 knit: (
   function(inputFile, encoding) { 
 
@@ -21,7 +22,10 @@ knit: (
       params      = list(sub_title = pSubTitle),      
       output_file = pSubTitle) })
 ---
-
+```{r setup, include=FALSE, echo=FALSE}
+require("knitr")
+opts_knit$set(root.dir = "E:/all_code/R-for-bioinformatics")
+```
 ## 练习和作业说明
 
 将相关代码填写入以 \`\`\`{r} \`\`\` 标志的代码框中，运行并看到正确的结果；
@@ -62,10 +66,11 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-options(warn = -1)
+
+options(warn = -1, message = -1)
 library("tidyverse")
 library("reshape2")
-options(warn = 0)
+options(warn = 0, message = 0)
 mouse_tibble <- read_delim("data/talk04/mouse_genes_biomart_sep2018.txt",
     delim = "\t", quote = "")
 
@@ -185,7 +190,8 @@ pivot_longer(grades.pivot_wider, cols = 2:6,
                       "Bioinformatics" = sample( 40:90, 7)
                       );
 
-然后统计： 1. 每个人最差的学科和成绩分别是什么？ 2. 哪个职业的平均成绩最好？ 3. 每个职业的最佳学科分别是什么（按平均分排序）？？？
+然后统计： 1. 每个人最差的学科和成绩分别是什么？ 2. 哪个职业的平均成绩最好？
+3. 每个职业的最佳学科分别是什么（按平均分排序）？？？
 
 
 ```{r}
@@ -262,18 +268,23 @@ human_bmi <- filter(starwars, species == "Human") %>%
 
 human_bmi %>%
     filter(!is.na(BMI_group)) %>%
-    ggplot(aes(x = factor(BMI_group, levels = c("Underweight", "Normal", "Overweight", "Obese")),
-               y = count)) + 
-    geom_bar(stat = "identity") +
-    labs(x = "BMI Group", y = "Count")
+    ggplot(aes(x = factor(BMI_group,
+        levels = c("Underweight", "Normal", "Overweight", "Obese")),
+        y = count)) +
+    # 调整颜色
+    geom_bar(stat = "identity", fill = "steelblue") +
+    labs(x = "BMI Group", y = "Count") +
+    theme_bw()
 
 # human_bmi 中的 BMI_group 按照相应的 count 重新设定 levels
 human_bmi %>%
     filter(!is.na(BMI_group)) %>%
-    ggplot(aes(x = factor(BMI_group, levels = human_bmi$BMI_group[order(human_bmi$count)]),
-               y = count)) + 
-    geom_bar(stat = "identity") +
-    labs(x = "BMI Group", y = "Count")
+    ggplot(aes(x = factor(BMI_group,
+        levels = human_bmi$BMI_group[order(human_bmi$count)]),
+        y = count)) +
+    geom_bar(stat = "identity", fill = "steelblue") +
+    labs(x = "BMI Group", y = "Count") +
+    theme_bw()
 
 ```
 
@@ -288,8 +299,9 @@ human_bmi %>%
 ## 代码写这里，并运行；
 starwars %>%
     # 保持所有列不变，增加一列 nr_films
-    mutate(nr_films = map_int(films, length))
-    
+    mutate(nr_films = map_int(films, length)) %>%
+    select(name, nr_films, 2:length(starwars))
+
 ```
 
 ### **使用`Theoph`变量做练习**
@@ -300,12 +312,11 @@ starwars %>%
 
 ```{r}
 ## 代码写这里，并运行；
-Theoph <- tibble(Theoph)
+theoph <- tibble(Theoph)
 # 选取从 Subject 到 Dose 的列
-select(Theoph, Subject:Dose)
+select(theoph, Subject:Dose)
 
-colnums <- select(Theoph, Subject:Dose) %>% ncol()
-message("总共有", colnums, "列")
+message("总共有", ncol(select(theoph, Subject:Dose)), "列")
 
 ```
 
@@ -313,16 +324,18 @@ message("总共有", colnums, "列")
 
 ```{r}
 ## 代码写这里，并运行；
-Theoph %>%
-    filter(Dose > 5, Time > mean(Time))
+theoph %>%
+    filter(Time > mean(Time)) %>%
+    filter(Dose > 5)
 
 ```
 
-3. 用 `mutate` 函数产生新列 `trend`，其值为 `Time` 与 `Time`列平均值的差；注意：请去除可能产生的 `na` 值；
+3. 用 `mutate` 函数产生新列 `trend`，其值为 `Time` 与 `Time`列平均值的差
+注意：请去除可能产生的 `na` 值；
 
 ```{r}
 ## 代码写这里，并运行；
-Theoph %>%
+theoph %>%
     mutate(trend = Time - mean(Time, na.rm = TRUE)) %>%
     filter(!is.na(trend))
 
@@ -337,9 +350,10 @@ Theoph %>%
 
 ```{r}
 ## 代码写这里，并运行；
-Theoph %>%
-    mutate(weight_cat = ifelse(Wt > 76.2, "Super-middleweight",
-                        ifelse(Wt > 72.57, "Middleweight",
-                        ifelse(Wt > 66.68, "Light-middleweight", "Welterweight"))))
-
+theoph %>%
+    mutate(weight_cat =
+      ifelse(Wt > 76.2, "Super-middleweight",
+      ifelse(Wt > 72.57, "Middleweight",
+      ifelse(Wt > 66.68, "Light-middleweight", "Welterweight")))) %>%
+      print(n = 50)
 ```
