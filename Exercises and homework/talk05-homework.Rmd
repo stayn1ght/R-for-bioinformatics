@@ -66,11 +66,8 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-
-options(warn = -1, message = -1)
 library("tidyverse")
 library("reshape2")
-options(warn = 0, message = 0)
 mouse_tibble <- read_delim("data/talk04/mouse_genes_biomart_sep2018.txt",
     delim = "\t", quote = "")
 
