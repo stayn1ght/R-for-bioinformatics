@@ -61,7 +61,7 @@ Sys.getenv("HOME")
     abu <- 
       read_delim(
         file = "../data/talk06/relative_abundance_for_RUN_ERR1072629_taxonlevel_species.txt",
-        delim = "\t", quote = "", comment = "#");
+        delim = "\t", quote = "", comment = "#")
 
 2.  取前5个丰度最高的菌，将其它的相对丰度相加并归为一类 `Qita`；
 
@@ -69,16 +69,16 @@ Sys.getenv("HOME")
 
 ![make a pie chart like this using the meteagenomics data](../images/talk06/121-ggplot-pie-chart-donut-chart-1.png){height="50%"}
 
-```{r}
-## 代码写这里，并运行；
-options(warning = -1, message = -1)
+```{r message = FALSE, warning = FALSE}
 library("tidyverse")
 library(ggplot2)
 library(forcats)
-options(warning = 0, message = 0)
+```
+```{r}
+## 代码写这里，并运行；
 abu <- read_delim(
     file = "./data/talk06/relative_abundance_for_RUN_ERR1072629_taxonlevel_species.txt",
-    delim = "\t", quote = "", comment = "#")
+    delim = "\t", quote = "", comment = "#", show_col_types = FALSE)
 # 取前5个丰度最高的菌，其他的菌相对丰度相加并归为一类 Qita
 (qita_abu <- abu %>%
   arrange(desc(relative_abundance)) %>%
