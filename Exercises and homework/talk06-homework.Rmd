@@ -145,7 +145,6 @@ ggplot(starwars, aes(x = fct_infreq(fct_lump(starwars$skin_color,
   n = count(color_freq)$n, other_level = "Others")))) +
   geom_bar() +
   # 添加坐标轴标签
-  
   coord_flip() +
   theme_bw()
 
@@ -199,10 +198,10 @@ ppi2 <- ppi %>%
   mutate(gene = ifelse(gene1 %in% gene2, gene2, gene1)) %>%
   select(gene) %>%
   distinct()
-# 画图
-# 安装 ggraph 包
-# conda 安装 igraph 包: conda install -c r r-igraph
-# conda 创建新环境: conda create -n r-igraph r-igraph
+# 画图 igraph
+g <- graph_from_data_frame(ppi2, directed = F)
+
+
 ```
 
 ### **对宏基因组 相对丰度数据 进行分析**
