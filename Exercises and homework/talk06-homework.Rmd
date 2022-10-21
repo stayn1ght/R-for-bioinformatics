@@ -123,7 +123,7 @@ ggplot(starwars, aes(x = hair_color)) +
 
 ```{r}
 ## 代码写这里，并运行；
-ggplot(starwars, aes(x = fct_infreq(starwars$hair_color))) +
+ggplot(starwars, aes(x = fct_infreq(hair_color))) +
   geom_bar() +
   coord_flip()
 ```
@@ -141,7 +141,7 @@ color_freq <- starwars %>%
 
 # 利用 fct_lump() 将出现频率小于 0.05 的颜色归为一类 Others,
 # 参数 n 的作用是保留最常见的 n 种颜色
-ggplot(starwars, aes(x = fct_infreq(fct_lump(starwars$skin_color,
+ggplot(starwars, aes(x = fct_infreq(fct_lump(skin_color,
   n = count(color_freq)$n, other_level = "Others")))) +
   geom_bar() +
   # 添加坐标轴标签
