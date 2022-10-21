@@ -64,53 +64,55 @@ Sys.getenv("HOME")
 
 实现上述目标（即：去掉少于500基因的染色体、排序、并统计）时不使用中间变量；
 
-```{r}
-## 代码写这里，并运行；
+
+```{r, results='hide', message=FALSE, warning=FALSE}
 library("tidyverse")
 library("reshape2")
 mouse_tibble <- read_delim("data/talk04/mouse_genes_biomart_sep2018.txt",
-    delim = "\t", quote = "")
+    delim = "\t", quote = "", show_col_types = FALSE)
 
-# 挑出最长和最短的基因
-longest_gene <- mouse_tibble %>%
-    group_by(`Chromosome/scaffold name`, `Transcript type`) %>%
-    summarise(count = n(),
-        mean_length = mean(`Transcript length (including UTRs and CDS)`),
-        min_length = min(`Transcript length (including UTRs and CDS)`),
-        max_length = max(`Transcript length (including UTRs and CDS)`))
-# 挑出最长和最短的基因
-longest_gene <- mouse_tibble %>%
-    group_by(`Chromosome/scaffold name`) %>%
-    top_n(1, `Transcript length (including UTRs and CDS)`) %>%
-    ungroup() %>%
-    select(longest_gene = `Gene stable ID`,
-      `Chromosome/scaffold name`, `Transcript type`)
-shortest_gene <- mouse_tibble %>%
-    group_by(`Chromosome/scaffold name`, `Transcript type`) %>%
-    top_n(-1, `Transcript length (including UTRs and CDS)`) %>%
-    ungroup() %>%
-    select(shortest_gene = `Gene stable ID`,
-      `Chromosome/scaffold name`, `Transcript type`)
-
-# 每个染色体（或scaffold）上每种基因类型的数量、平均长度、最大和最小长度
-summary_mouse <- mouse_tibble %>%
-    group_by(`Chromosome/scaffold name`, `Transcript type`) %>%
-    summarise(gene_count = n(),
-        mean_length = mean(`Transcript length (including UTRs and CDS)`),
-        min_length = min(`Transcript length (including UTRs and CDS)`),
-        max_length = max(`Transcript length (including UTRs and CDS)`)) %>%
-    left_join(longest_gene,
-      by = c("Chromosome/scaffold name", "Transcript type")) %>%
-    left_join(shortest_gene,
-      by = c("Chromosome/scaffold name", "Transcript type")) %>%
-    group_by(`Chromosome/scaffold name`) %>%
-    # 去掉含有500以下基因的染色体（或scaffold），按染色体（或scaffold）、数量 高 -\> 低 进行排序
-    mutate(nr_genes_chrom = sum(gene_count)) %>%
-    filter(nr_genes_chrom > 500) %>%
-    arrange(`Chromosome/scaffold name`, desc(gene_count))
-    # 平均长度这一列四舍五入到整数
-summary_mouse$mean_length <- round(summary_mouse$mean_length)
-summary_mouse
+```
+```{r}
+## 代码写这里，并运行；
+message("不使用中间变量实现上述目标。")
+mouse_tibble %>%
+  group_by(`Chromosome/scaffold name`, `Transcript type`) %>%
+  mutate(
+    # 使用 mutate 函数统计每个染色体上每种基因类型的数量、平均长度、最大和最小长度
+    count = n(),
+    # mean_length 保留整数
+    mean_length = round(mean(`Transcript length (including UTRs and CDS)`)),
+    max_length = max(`Transcript length (including UTRs and CDS)`),
+    min_length = min(`Transcript length (including UTRs and CDS)`),
+  ) %>%
+  ungroup() %>%
+  rename(gene_length = `Transcript length (including UTRs and CDS)`) %>%
+  # 标记出最长和最短的基因
+  mutate(variable = ifelse(gene_length == max_length, "is_max",
+                    ifelse(gene_length == min_length, "is_min", NA))) %>%
+  arrange(`Chromosome/scaffold name`, `Transcript type`) %>%
+  filter(!is.na(variable)) %>%
+  select(`Gene stable ID`, `Chromosome/scaffold name`, `Transcript type`,
+        count, mean_length, max_length, min_length, variable) %>%
+  data.frame()  %>%
+  # 每个染色体上每种基因类型最长和最短的基因。可能有多个基因，用逗号分隔。
+  dcast(`Chromosome.scaffold.name` + `Transcript.type` + count +
+      mean_length + max_length + min_length ~ variable,
+      value.var = "Gene.stable.ID",
+      fun.aggregate = function(x) paste(x, collapse = ", ")) %>%
+  tibble() %>%
+  # 如果 is_min 为空，说明最长的基因和最短的基因相同
+  mutate(is_min = ifelse(is_min == "", is_max, is_min)) %>%
+  distinct() %>%
+  # 去掉少于500基因的染色体
+  filter(count > 500) %>%
+  # 按染色体（或scaffold）、数量 高 -\> 低 进行排序
+  rename(gene_count = count, longest_gene = is_max,
+        shortest_gene = is_min) %>%
+  arrange(desc(gene_count)) %>%
+  # 显示前 10 行输出结果
+  data.frame() %>%
+  head(10)
 
 ```
 
@@ -127,7 +129,7 @@ summary_mouse
 
 ```{r}
 ## 代码写这里，并运行；
-grades <- read_tsv(file = "data/talk05/grades.txt")
+grades <- read_tsv(file = "data/talk05/grades.txt", show_col_types = FALSE)
 grades_spread <- spread(grades, key = `course`, value = `grade`)
 grades_gather <- gather(grades_spread, key = `course`,
   value = `grade`, -name) %>%
@@ -167,8 +169,7 @@ pivot_longer(grades.pivot_wider, cols = 2:6,
 
 ` grades %>% complete( name, course ) `
 
-答： `complete` 函数用于填充缺失值，这里是填充 `name` 和 `course` 的缺失值，
-    使得每个 `name` 和 `course` 都有一个 grade 值。
+答： `complete` 函数用于填充缺失值，这里是填充 `name` 和 `course` 的缺失值，使得每个 `name` 和 `course` 都有一个 grade 值。
 
 
 ------------------------------------------------------------------------
@@ -193,6 +194,7 @@ pivot_longer(grades.pivot_wider, cols = 2:6,
 
 ```{r}
 ## 代码写这里，并运行；
+set.seed(123)
 grades2 <- tibble("Name" = c("Weihua Chen", "Mm Hu", "John Doe", "Jane Doe",
     "Warren Buffet", "Elon Musk", "Jack Ma"),
   "Occupation" = c("Teacher", "Student", "Teacher", "Student",
@@ -229,7 +231,10 @@ grades2 %>%
   gather(key = "course", value = "grade", -Name, -Occupation) %>%
   group_by(Occupation, course) %>%
   summarise(avg_grade = mean(grade)) %>%
-  arrange(Occupation, desc(avg_grade))
+  arrange(Occupation, desc(avg_grade)) %>%
+  group_by(Occupation) %>%
+  rename(best_course = course) %>%
+  slice(1)
 
 ```
 
@@ -242,7 +247,6 @@ grades2 %>%
 
 ```{r}
 ## 代码写这里，并运行；
-mutate(starwars, BMI = mass / (height / 100)^2)
 mutate(starwars, BMI = mass / (height / 100)^2) %>%
   filter(BMI >= 30) %>%
   select(name, sex, homeworld)
@@ -295,9 +299,13 @@ human_bmi %>%
 ```{r}
 ## 代码写这里，并运行；
 starwars %>%
-    # 保持所有列不变，增加一列 nr_films
+    # 保持所有列不变，增加一列 nr_films,
+    # 使用 map_int() 函数计算每个角色出现的电影数
     mutate(nr_films = map_int(films, length)) %>%
-    select(name, nr_films, 2:length(starwars))
+    select(name, nr_films, 2:length(starwars), -films) %>%
+    # 展示前 5 行
+    data.frame() %>%
+    head(5)
 
 ```
 
@@ -352,5 +360,5 @@ theoph %>%
       ifelse(Wt > 76.2, "Super-middleweight",
       ifelse(Wt > 72.57, "Middleweight",
       ifelse(Wt > 66.68, "Light-middleweight", "Welterweight")))) %>%
-      print(n = 50)
+      print(n = 20)
 ```
