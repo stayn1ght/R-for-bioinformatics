@@ -182,10 +182,10 @@ ppi <- read_delim(file = "./data/talk06/ppi900.txt.gz", col_names = T,
                    delim =  "\t", quote = "")
 # 选择一个基因
 set.seed(123)
-gene <- sample(ppi$gene1, 1)
+gene_selected <- sample(ppi$gene1, 1)
 # 选择与该基因互作的基因
 gene2 <- ppi %>%
-  filter(gene1 == gene | gene2 == gene) %>%
+  filter(gene1 == gene_selected | gene2 == gene_selected) %>%
   select(gene1, gene2) %>%
   ungroup() %>%
   mutate(gene = ifelse(gene1 == gene, gene2, gene1)) %>%
@@ -199,9 +199,10 @@ ppi2 <- ppi %>%
   mutate(gene = ifelse(gene1 %in% gene2, gene2, gene1)) %>%
   select(gene) %>%
   distinct()
-# 画图 igraph
-g <- graph_from_data_frame(ppi2, directed = F)
 
+ppi2$gene1 <- gene
+# 画图 igraph
+g <- graph_from_data_frame(ppi2, directed = FALSE)
 
 ```
 
