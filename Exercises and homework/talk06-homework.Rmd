@@ -181,6 +181,7 @@ ggplot(starwars, aes(x = fct_relevel(fct_infreq(fct_lump(skin_color,
 ppi <- read_delim(file = "./data/talk06/ppi900.txt.gz", col_names = T,
                    delim =  "\t", quote = "")
 # 选择一个基因
+set.seed(123)
 gene <- sample(ppi$gene1, 1)
 # 选择与该基因互作的基因
 gene2 <- ppi %>%
