@@ -71,13 +71,15 @@ Sys.getenv("HOME")
 
 ```{r message = FALSE, warning = FALSE}
 library("tidyverse")
-library(ggplot2)
-library(forcats)
+library("ggplot2")
+library("forcats")
+library("igraph")
 ```
 ```{r}
 ## 代码写这里，并运行；
 abu <- read_delim(
-    file = "./data/talk06/relative_abundance_for_RUN_ERR1072629_taxonlevel_species.txt",
+    file = paste0("./data/talk06/relative_abundance_for_",
+      "RUN_ERR1072629_taxonlevel_species.txt"),
     delim = "\t", quote = "", comment = "#", show_col_types = FALSE)
 # 取前5个丰度最高的菌，其他的菌相对丰度相加并归为一类 Qita
 (qita_abu <- abu %>%
@@ -178,8 +180,8 @@ ggplot(starwars, aes(x = fct_relevel(fct_infreq(fct_lump(skin_color,
 
 ```{r}
 ## 代码写这里，并运行；
-ppi <- read_delim(file = "./data/talk06/ppi900.txt.gz", col_names = T,
-                   delim =  "\t", quote = "")
+ppi <- read_delim(file = "./data/talk06/ppi900.txt.gz", col_names = TRUE,
+    delim =  "\t", quote = "", show_col_types = FALSE)
 # 选择一个基因
 set.seed(123)
 gene_selected <- sample(ppi$gene1, 1)
@@ -188,8 +190,6 @@ gene2 <- ppi %>%
   filter(gene1 == gene_selected | gene2 == gene_selected) %>%
   select(gene1, gene2) %>%
   ungroup() %>%
-  mutate(gene = ifelse(gene1 == gene, gene2, gene1)) %>%
-  select(gene) %>%
     distinct()
 # 选择与该基因互作的基因的互作关系
 ppi2 <- ppi %>%
@@ -200,7 +200,6 @@ ppi2 <- ppi %>%
   select(gene) %>%
   distinct()
 
-ppi2$gene1 <- gene
 # 画图 igraph
 g <- graph_from_data_frame(ppi2, directed = FALSE)
 
