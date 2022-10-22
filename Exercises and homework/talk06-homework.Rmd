@@ -186,23 +186,37 @@ ppi <- read_delim(file = "./data/talk06/ppi900.txt.gz", col_names = TRUE,
 set.seed(123)
 gene_selected <- sample(ppi$gene1, 1)
 # 选择与该基因互作的基因
-gene2 <- ppi %>%
-  filter(gene1 == gene_selected | gene2 == gene_selected) %>%
-  select(gene1, gene2) %>%
-  ungroup() %>%
-    distinct()
-# 选择与该基因互作的基因的互作关系
 ppi2 <- ppi %>%
-  filter(gene1 %in% gene2 | gene2 %in% gene2) %>%
-  select(gene1, gene2) %>%
+  filter(gene1 == gene_selected) %>%
   ungroup() %>%
-  mutate(gene = ifelse(gene1 %in% gene2, gene2, gene1)) %>%
-  select(gene) %>%
+  # 每行 gene1 与 gene2 的集合去重
   distinct()
+genes_tar <- unique(c(gene_selected, ppi2$gene2))
 
-# 画图 igraph
-g <- graph_from_data_frame(ppi2, directed = FALSE)
+genes_net <- ppi %>%
+  filter(gene1 %in% genes_tar & gene2 %in% genes_tar) %>%
+  mutate(group = ifelse(gene2 > gene1,
+    paste(gene1, gene2, sep = "-"),
+    paste(gene2, gene1, sep = "-"))) %>%
+  distinct(group, .keep_all = TRUE)
 
+
+# 计算网络
+# gene 与 gene2 之间的边的权重为 score
+g <- graph_from_data_frame(d = genes_net, vertices = NULL,
+  directed = FALSE)
+
+# 每个点的大小为与该点互作的基因数
+v_size <- degree(g)
+# 边的颜色为 score
+e_color <- genes_net$score
+
+# 画图。
+plot(g, layout = layout_nicely(g), vertex.size = v_size,
+    legend = legend, width = 5, height = 5, edge.color = e_color,
+    main = paste("Network of genes interacted with", gene_selected),
+    vertex.label.cex = sqrt(v_size / max(v_size)) * 1.5)
+  
 ```
 
 ### **对宏基因组 相对丰度数据 进行分析**
