@@ -52,6 +52,13 @@ Sys.getenv("HOME")
 
 ------------------------------------------------------------------------
 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library("tidyverse")
+library("forcats")
+library("ggplot2")
+library("reshape2")
+```
+
 ### **用下面的数据作图**
 
 1.  利用下面代码读取一个样本的宏基因组相对丰度数据
