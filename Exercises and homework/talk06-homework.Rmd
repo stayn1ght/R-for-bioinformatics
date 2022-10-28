@@ -157,6 +157,10 @@ ggplot(starwars, aes(x = hair_color)) +
 
 ```{r}
 ## 代码写这里，并运行；
+# 按数量从小到大排序
+ggplot(starwars, aes(x = fct_infreq(hair_color))) + 
+  geom_bar() + 
+  coord_flip()
 
 ```
 
