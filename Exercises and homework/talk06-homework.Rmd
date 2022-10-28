@@ -216,7 +216,7 @@ plot(g, layout = layout_nicely(g), vertex.size = v_size,
     legend = legend, width = 5, height = 5, edge.color = e_color,
     main = paste("Network of genes interacted with", gene_selected),
     vertex.label.cex = sqrt(v_size / max(v_size)) * 1.5)
-  
+
 ```
 
 ### **对宏基因组 相对丰度数据 进行分析**
