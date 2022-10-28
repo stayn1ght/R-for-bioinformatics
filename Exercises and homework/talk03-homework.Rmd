@@ -480,7 +480,7 @@ stats2 <- read.csv("data/states2.csv", header = TRUE,
   sep = ";", dec = ",")
 stats2
 
-if (!require("readr")){ 
+if (!require("readr")){
   chooseCRANmirror()
   install.packages("readr")
 } 

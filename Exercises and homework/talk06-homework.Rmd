@@ -42,6 +42,10 @@ knit: (
 
 **如你当前用户名不能体现你的真实姓名，请改为拼音后再运行本作业！**
 
+```{r setup, include=FALSE, echo=FALSE}
+require("knitr")
+opts_knit$set(root.dir = "E:/all_code/R-for-bioinformatics")
+```
 ```{r}
 Sys.info()[["user"]]
 Sys.getenv("HOME")
@@ -74,6 +78,8 @@ library("tidyverse")
 library("ggplot2")
 library("forcats")
 library("igraph")
+library("reshape2")
+library("RColorBrewer")
 ```
 ```{r}
 ## 代码写这里，并运行；
@@ -126,7 +132,8 @@ ggplot(starwars, aes(x = hair_color)) +
 ```{r}
 ## 代码写这里，并运行；
 ggplot(starwars, aes(x = fct_infreq(hair_color))) +
-  geom_bar() +
+  geom_bar(fill = "#92C5DE") +
+  theme_bw() +
   coord_flip()
 ```
 
@@ -144,11 +151,14 @@ color_freq <- starwars %>%
 # 利用 fct_lump() 将出现频率小于 0.05 的颜色归为一类 Others,
 # 参数 n 的作用是保留最常见的 n 种颜色
 ggplot(starwars, aes(x = fct_infreq(fct_lump(skin_color,
-  n = count(color_freq)$n, other_level = "Others")))) +
-  geom_bar() +
+    n = count(color_freq)$n, other_level = "Others")))) +
+  geom_bar(fill = "#92C5DE") +
   # 添加坐标轴标签
   coord_flip() +
-  theme_bw()
+  theme_bw() +
+  # x 轴改为 “skin color”
+  xlab("skin color") +
+  ylab("count")
 
 ```
 
@@ -158,7 +168,7 @@ ggplot(starwars, aes(x = fct_infreq(fct_lump(skin_color,
 ## 代码写这里，并运行；
 ggplot(starwars, aes(x = fct_relevel(fct_infreq(fct_lump(skin_color,
   n = count(color_freq)$n, other_level = "Others")), "Others", after = 3))) +
-  geom_bar() +
+  geom_bar(fill = "#92C5DE") +
   coord_flip() +
   theme_bw()
 ```
@@ -210,7 +220,9 @@ g <- graph_from_data_frame(d = genes_net, vertices = NULL,
 v_size <- degree(g)
 # 边的颜色为 score
 e_color <- genes_net$score
+```
 
+```{r fig.width=15, fig.height=20}
 # 画图。
 plot(g, layout = layout_nicely(g), vertex.size = v_size,
     legend = legend, width = 5, height = 5, edge.color = e_color,
@@ -239,5 +251,52 @@ plot(g, layout = layout_nicely(g), vertex.size = v_size,
 
 ```{r}
 ## 代码写这里，并运行；
+# 读取文件
+files <- list.files(path = "Exercises and homework/data/talk06/", full.names = TRUE)
+# 提取 scientific_name 和 relative_abundance 两列
+files_df <- lapply(files, function(x) {
+    read_tsv(x, col_names = FALSE, skip = 4, show_col_types = FALSE) %>%
+    select(scientific_name = X4, relative_abundance = X3)
+})
 
+# 添加一列为样本名
+sample_names <- str_extract(files, "PRJEB6070-DE-\\d{3}")
+sampled_df <- lapply(seq_along(files_df), function(x) {
+    files_df[[x]] %>%
+    mutate(sample_name = sample_names[x])
+})
+
+# 以 scientific_name 为 key，将其内容合并为一个 data.frame
+taxon_abundance <- bind_rows(sampled_df) %>%
+    dcast(scientific_name ~ sample_name, value.var = "relative_abundance",
+    # 保留两位小数
+    fun.aggregate = function(x) round(sum(x, na.rm = TRUE), 2)) %>%
+    # 将 NA 值改为 0. 使用 replace_na() 也可以
+    mutate_at(vars(-scientific_name), ~replace(., is.na(.), 0))
+
+
+# 画图, 每个样本的物种堆叠图
+df1 <- taxon_abundance %>%
+  # 每个样本保留相对丰度最高的前10个物种，其他物种合并为 Others
+  arrange(desc(`PRJEB6070-DE-073`), desc(`PRJEB6070-DE-074`),
+    desc(`PRJEB6070-DE-075`), desc(`PRJEB6070-DE-076`),
+    desc(`PRJEB6070-DE-077`)) %>%
+    # 前 11 个物种保留，其他物种合并为 Others
+    mutate(scientific_name = ifelse(row_number() <= 11,
+      scientific_name, "Others")) %>%
+    group_by(scientific_name) %>%
+    # 按照物种名合并
+    summarise_all(sum) %>%
+    melt(id.vars = "scientific_name") %>%
+    tibble() %>%
+    filter(value > 0)
+
+ggplot(df1, aes(x = variable, y = value, fill = scientific_name)) +
+  geom_col(position = "stack", width = 0.6) +
+  scale_fill_manual(values = brewer.pal(n = 12, "Paired")) +
+  theme_bw() +
+  scale_y_continuous(expand = c(0,0)) + # 调整y轴属性，使柱子与X轴坐标接触
+  labs(x = "Samples", y = "Relative Abundance",
+       fill = "Species")
+  
 ```
