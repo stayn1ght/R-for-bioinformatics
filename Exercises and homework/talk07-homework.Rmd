@@ -73,6 +73,8 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
+library(stringr)
+library(forcats)
 
 ```
 
