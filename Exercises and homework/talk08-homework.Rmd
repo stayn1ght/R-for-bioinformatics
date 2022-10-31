@@ -60,9 +60,44 @@ Sys.getenv("HOME")
 3. 写一个`while`循环，每次用 `rnorm`取一个随机数字并打印，直到取到的数字大于1；
 4. 写一个循环，计算Fibonacci序列的值超过1百万所需的循环数；注：Fibonacci 序列的规则为：`0, 1, 1, 2, 3, 5, 8, 13, 21 ... `;
 
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+## 代码写这里，并运行；
+library("tidyverse")
+library(reshape2)
+```
 ```{r}
 ## 代码写这里，并运行；
+# 1. 写一个循环，计算从1到7的平方并打印 print；
+for (i in 1:7) {
+  print(i^2)
+}
+# 2. 取iris的列名，计算每个列名的长度，并打印为下面的格式： Sepal.Length (12)；
+for (i in colnames(iris)) {
+  print(paste(i, "(Length: ", nchar(i), ")", sep = ""))
+}
+# 3. 写一个while循环，每次用 rnorm取一个随机数字并打印，直到取到的数字大于1；
+while (TRUE) {
+  x <- rnorm(1)
+  print(x)
+  if (x > 1) {
+    break
+  }
+}
+# 4. 写一个循环，计算Fibonacci序列的值超过1百万所需的循环数
 
+x <- 0
+y <- 1
+i <- 0
+while (TRUE) {
+  z <- x + y
+  x <- y
+  y <- z
+  i <- i + 1
+  if (z > 1000000) {
+    break
+  }
+}
+print(i)
 ```
 
 
@@ -84,6 +119,28 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
+# 生成一个 100 x 100 的数字 matrix：
+x <- matrix(rnorm(10000), nrow = 100, ncol = 100)
+message("1. 行、列平均，用rowMeans, colMeans函数；")
+rowMeans(x) %>% head(5)
+colMeans(x) %>% head(5)
+message("2. 行、列平均，用 apply 函数")
+apply(x, 1, mean) %>% head(5)
+apply(x, 2, mean) %>% head(5)
+message("3. 行、列总和，用rowSums, colSums 函数；")
+rowSums(x) %>% head(5)
+colSums(x) %>% head(5)
+message("4. 行、列总和，用 apply 函数")
+apply(x, 1, sum) %>% head(5)
+apply(x, 2, sum) %>% head(5)
+message("5. 使用自定义函数，同时计算 行平均、总和、 sd")
+myfun <- function(x) {
+  c(mean = mean(x), sum = sum(x), sd = sd(x))
+}
+apply(x, 1, myfun)[, 1:5]
+
+message("5. 使用自定义函数，同时计算 列平均、总和、 sd ")
+apply(x, 2, myfun)[, 1:5]
 
 ```
 
@@ -101,6 +158,20 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
+# 用tapply练习：
+message("1. tapply 用汽缸数分组， 计算油耗的平均值")
+tapply(mtcars$mpg, mtcars$cyl, mean)
+message("1. tapply 用汽缸数分组， 计算 wt 的平均值")
+tapply(mtcars$wt, mtcars$cyl, mean)
+
+message("3. dplyr 用汽缸数分组， 计算油耗的平均值")
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(mean_mpg = mean(mpg))
+message("3. dplyr 用汽缸数分组， 计算 wt 的平均值")
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(mean_wt = mean(wt))
 
 ```
 
@@ -116,6 +187,18 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
+# 1. 分别用 lapply和sapply 计算下面list里每个成员 vector的长度：
+x <- list(a = 1:10, b = letters[1:5], c = LETTERS[1:8])
+message("1. 用 lapply 计算 list 里每个成员的长度")
+lapply(x, length)
+message("2. 用 sapply 计算 list 里每个成员的长度")
+sapply(x, length)
+
+# 2. 分别用 lapply和sapply 计算 mtcars 每列的平均值；
+message("3. 用 lapply 计算 mtcars 每列的平均值")
+lapply(mtcars, mean)
+message("4. 用 sapply 计算 mtcars 每列的平均值")
+sapply(mtcars, mean)
 
 ```
 
@@ -144,6 +227,14 @@ df <- tibble(
 
 ```{r}
 ## 代码写这里，并运行；
+df <- tibble(a = rnorm(10), b = rnorm(10), c = rnorm(10), d = rnorm(10))
+# 用 map 计算：列 平均值、总和和中值
+message("列平均值")
+df %>% map_dbl(mean)
+message("列总和")
+df %>% map_dbl(sum)
+message("列中值")
+df %>% map_dbl(median)
 
 ```
 
@@ -159,6 +250,17 @@ df <- tibble(
 ```{r}
 ## 代码写这里，并运行；
 
+df1 <- mtcars %>%
+  split(.$cyl) %>%
+  map_dbl(~ cor.test(.$mpg, .$wt)$p.value)
+df2 <- mtcars %>%
+  split(.$cyl) %>%
+  map_dbl(~ cor.test(.$mpg, .$wt)$estimate)
+data.frame(df1, df2) %>%
+  rownames_to_column(var = "cyl") %>% 
+  rename(correlation = df2, pValue = df1)
+
+
 ```
 ------------------------------------------------------------------------
 
@@ -170,6 +272,11 @@ df <- tibble(
 
 ```{r}
 ## 代码写这里，并运行；
+message("保留 iris 中有 factor 的列，并打印前10行")
+iris %>% keep(is.factor) %>% head(10)
+message("去掉 iris 中有 factor 的列，并打印前10行")
+iris %>% discard(is.factor) %>% head(10)
+
 
 ```
 ------------------------------------------------------------------------
@@ -186,6 +293,8 @@ c(1, 3, 5, 6, 10),
 
 ```{r}
 ## 代码写这里，并运行；
+x <- list(c(1, 3, 5, 6, 10), c(1, 2, 3, 7, 8, 10), c(1, 2, 3, 4, 8, 9, 10))
+reduce(x, intersect)
 
 ```
 
@@ -204,6 +313,21 @@ dfs %>% reduce(full_join);
 ```
 ```{r}
 ## 代码写这里，并运行；
+dfs <- list(
+  age = tibble(name = "John", age = 30),
+  sex = tibble(name = c("John", "Mary"), sex = c("M", "F")),
+  trt = tibble(name = "Mary", treatment = "A")
+)
+dfs %>% reduce(full_join)
+
+melt(dfs[[1]], id.vars = "name") %>%
+  rbind(melt(dfs[[2]], id.vars = "name")) %>%
+  rbind(melt(dfs[[3]], id.vars = "name")) %>%
+  spread(key = variable, value = value)
+
+```
+
+
 
 ```
 
@@ -220,28 +344,28 @@ dfs %>% reduce(full_join);
 ```
 
 ```{r}
-library(parallel); ## 
-library(foreach);
-library(iterators);
+library(parallel)
+library(foreach)
+library(iterators)
 
 ## 检测有多少个 CPU --
-( cpus <- parallel::detectCores() );
+(cpus <- parallel::detectCores())
 
 ## 创建一个 data.frame 
-d <- data.frame(x=1:10000, y=rnorm(10000));
+d <- data.frame(x = 1:10000, y = rnorm(10000))
 
 ## make a cluster --
-cl <- makeCluster( cpus - 1 );
+cl <- makeCluster(cpus - 1)
 
-## 分配任务 ... 
-res <- foreach( row = iter( d, by = "row" ) ) %dopar% {
-  return ( row$x * row$y  );
+## 分配任务 ...
+res <- foreach(row = iter(d, by = "row")) %dopar% {
+  return(row$x * row$y)
 }
 
-## 注意在最后关闭创建的 cluster 
-stopCluster( cl );
+## 注意在最后关闭创建的 cluster
+stopCluster(cl)
 
-summary(unlist(res));
+summary(unlist(res))
 ```
 
 **问**：你的系统有多少个CPU？此次任务使用了多少个？
@@ -249,5 +373,7 @@ summary(unlist(res));
 
 ```{r}
 ## 代码写这里，并运行；
+message("我的系统有", cpus, "个CPU")
+message("此次任务使用了", cpus - 1, "个CPU")
 
 ```
