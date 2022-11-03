@@ -100,7 +100,19 @@ str_count(x, '[aeiou]')
 
 ```{r}
 ## 代码写这里，并运行；
+library("tidyverse")
+mtcars %>%
+  # 筛选行名中包含'Mercedes-Benz'的行
+  filter(row.names(mtcars) %>% str_detect('Merc'))
 
+mtcars %>%
+  # 筛选行名中不包含'Mercedes-Benz'的行
+  filter(row.names(mtcars) %>% !str_detect('Merc'))
+
+mtcars %>%
+  # 处理行名，将其中的品牌与车型分开, 品牌与车型是以空格分隔的
+  mutate(brand = row.names(mtcars) %>% str_extract('^[a-zA-Z0-9]+'),
+         model = row.names(mtcars) %>% str_extract('\\s[a-zA-Z0-9-\\s]+'))
 ```
 
 
@@ -116,6 +128,10 @@ str_count(x, '[aeiou]')
 
 ```{r}
 ## 代码写这里，并运行；
+x <- c("abc", NA)
+# na值替换为字符串"NA"
+x[is.na(x)] <- "NA"
+str_c('|-', x, '-|')
 
 ```
 
@@ -137,7 +153,14 @@ str_count(x, '[aeiou]')
 
 ```{r}
 ## 代码写这里，并运行；
+starwars %>%
+  filter(str_detect(skin_color, 'white')) %>%
+  select(name, homeworld, species, skin_color)
 
+starwars %>%
+  # R 正则表达式中，不区分大小写，pattern = '(?i)ar'
+  filter(str_detect(name, pattern = '(?i)ar')) %>%
+  select(name)
 ```
 
 ------------------------------------------------------------------------
@@ -155,7 +178,19 @@ str_count(x, '[aeiou]')
 
 ```{r}
 ## 代码写这里，并运行；
-
+vec <- c( "123", "abc", "wei555hua666" )
+# 找出含有数字的字符串
+vec %>% str_detect('[0-9]')
+# 找出数字的位置
+vec %>% str_locate('[0-9]')
+# 找出所有数字的位置
+vec %>% str_locate_all('[0-9]')
+# 提取出找到的数字
+vec %>% str_extract('[0-9]+')
+# 提取所有的数字
+vec %>% str_extract_all('[0-9]+')
+# 将数字替换为 666
+vec %>% str_replace('[0-9]+', '666')
 ```
 
 ## 练习与作业3：探索题
@@ -173,7 +208,9 @@ str_count(x, '[aeiou]')
 
 ```{r}
 ## 代码写这里，并运行；
-
+seq <- "ATCTCGGCGCGCATCGCGTACGCTACTAGC"
+# 得到它的反向互补序列
+seq %>% DNAStringSet() %>% reverseComplement() %>% as.character()
 ```
 
 ###   **问答**
