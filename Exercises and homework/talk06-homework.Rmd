@@ -42,6 +42,10 @@ knit: (
 
 **如你当前用户名不能体现你的真实姓名，请改为拼音后再运行本作业！**
 
+```{r setup, include=FALSE, echo=FALSE}
+require("knitr")
+opts_knit$set(root.dir = "E:/all_code/R-for-bioinformatics")
+```
 ```{r}
 Sys.info()[["user"]]
 Sys.getenv("HOME")
@@ -68,7 +72,7 @@ library("reshape2")
     abu <- 
       read_delim(
         file = "../data/talk06/relative_abundance_for_RUN_ERR1072629_taxonlevel_species.txt",
-        delim = "\t", quote = "", comment = "#");
+        delim = "\t", quote = "", comment = "#")
 
 2.  取前5个丰度最高的菌，将其它的相对丰度相加并归为一类 `Qita`；
 
@@ -76,61 +80,41 @@ library("reshape2")
 
 ![make a pie chart like this using the meteagenomics data](../images/talk06/121-ggplot-pie-chart-donut-chart-1.png){height="50%"}
 
+```{r message = FALSE, warning = FALSE}
+library("tidyverse")
+library("ggplot2")
+library("forcats")
+library("igraph")
+library("reshape2")
+library("RColorBrewer")
+```
 ```{r}
 ## 代码写这里，并运行；
-abu <- 
-  read_delim(
-    file = "./data/talk06/relative_abundance_for_RUN_ERR1072629_taxonlevel_species.txt",
-    delim = "\t", quote = "", comment = "#")
+abu <- read_delim(
+    file = paste0("./data/talk06/relative_abundance_for_",
+      "RUN_ERR1072629_taxonlevel_species.txt"),
+    delim = "\t", quote = "", comment = "#", show_col_types = FALSE)
 # 取前5个丰度最高的菌，其他的菌相对丰度相加并归为一类 Qita
-(qita_abu <- abu %>% 
-  arrange(desc(relative_abundance)) %>% 
+(qita_abu <- abu %>%
+  arrange(desc(relative_abundance)) %>%
   slice(7:n()) %>%
   summarise(relative_abundance = sum(relative_abundance)) %>%
   mutate(scientific_name = "Qita") %>%
-  bind_rows(abu %>% 
-              arrange(desc(relative_abundance)) %>% 
+  bind_rows(abu %>%
+              arrange(desc(relative_abundance)) %>%
               slice(1:6)))
 
-######
-data <- data.frame(
-  category=c("A", "B", "C"),
-  count=c(10, 60, 30)
-)
-# Compute percentages
-data$fraction <- data$count / sum(data$count)
-# Compute the cumulative percentages (top of each rectangle)
-data$ymax <- cumsum(data$fraction)
-# Compute the bottom of each rectangle
-data$ymin <- c(0, head(data$ymax, n=-1))
-# Compute label position
-data$labelPosition <- (data$ymax + data$ymin) / 2
-# Compute a good label
-data$label <- paste0(data$category, "\n value: ", data$count)
-
-# Make the plot
-ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
-  geom_rect() +
-  geom_label( x=3.5, aes(y=labelPosition, label=label), size=6) +
-  scale_fill_brewer(palette=4) +
-  coord_polar(theta="y") +
-  xlim(c(2, 4)) +
-  theme_void() +
-  theme(legend.position = "none")
-
-######
-
 qita_abu$ymax <- cumsum(qita_abu$relative_abundance)
-qita_abu$ymin <- c(0, head(qita_abu$ymax, n=-1))
+qita_abu$ymin <- c(0, head(qita_abu$ymax, n = -1))
 qita_abu$labelPosition <- (qita_abu$ymax + qita_abu$ymin) / 2
 
 # 画图, 画出 donut chart
-ggplot(qita_abu, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=scientific_name)) +
+ggplot(qita_abu,
+    aes(ymax = ymax, ymin = ymin, xmax = 4, xmin = 3, fill = scientific_name)) +
   geom_rect() +
-  geom_text( x = 3.5, y= qita_abu$labelPosition,
-    label = paste(round(qita_abu$relative_abundance, 2), "%", sep = " "))+
-    # label = paste(scientific_name, relative_abundance, sep = "\n")), size = 6) +
-  # scale_fill_brewer(palette=4) +
+  geom_text(x = 3.5, y = qita_abu$labelPosition,
+    label = paste(round(qita_abu$relative_abundance, 2), "%", sep = " ")) +
+  scale_fill_brewer(palette=4) +
   coord_polar(theta = "y") +
   xlim(c(2, 4)) +
   theme_void() +
@@ -147,23 +131,41 @@ ggplot(qita_abu, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=scientific_name)
 但是，怎么做到**按数量从小到大**排序？
 
 ```{r}
-library(dplyr)
-library(ggplot2)
-library(forcats)
-ggplot(starwars, aes(x = hair_color)) + 
-  geom_bar() + 
+ggplot(starwars, aes(x = hair_color)) +
+  geom_bar() +
   coord_flip()
 ```
 
 ```{r}
 ## 代码写这里，并运行；
-
+ggplot(starwars, aes(x = fct_infreq(hair_color))) +
+  geom_bar(fill = "#92C5DE") +
+  theme_bw() +
+  coord_flip()
 ```
 
 2.  统计 `skin_color` 时，将出现频率小于0.05（即5%）的颜色归为一类`Others`，按出现次数排序后，做与上面类似的 barplot；
 
 ```{r}
 ## 代码写这里，并运行；
+# 统计每种 skin_color 的出现频率
+color_freq <- starwars %>%
+  group_by(skin_color) %>%
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n)) %>%
+  filter(freq >= 0.05)
+
+# 利用 fct_lump() 将出现频率小于 0.05 的颜色归为一类 Others,
+# 参数 n 的作用是保留最常见的 n 种颜色
+ggplot(starwars, aes(x = fct_infreq(fct_lump(skin_color,
+    n = count(color_freq)$n, other_level = "Others")))) +
+  geom_bar(fill = "#92C5DE") +
+  # 添加坐标轴标签
+  coord_flip() +
+  theme_bw() +
+  # x 轴改为 “skin color”
+  xlab("skin color") +
+  ylab("count")
 
 ```
 
@@ -171,7 +173,11 @@ ggplot(starwars, aes(x = hair_color)) +
 
 ```{r}
 ## 代码写这里，并运行；
-
+ggplot(starwars, aes(x = fct_relevel(fct_infreq(fct_lump(skin_color,
+  n = count(color_freq)$n, other_level = "Others")), "Others", after = 3))) +
+  geom_bar(fill = "#92C5DE") +
+  coord_flip() +
+  theme_bw()
 ```
 
 ## 练习与作业2：数据分析
@@ -191,6 +197,44 @@ ggplot(starwars, aes(x = hair_color)) +
 
 ```{r}
 ## 代码写这里，并运行；
+ppi <- read_delim(file = "./data/talk06/ppi900.txt.gz", col_names = TRUE,
+    delim =  "\t", quote = "", show_col_types = FALSE)
+# 选择一个基因
+set.seed(123)
+gene_selected <- sample(ppi$gene1, 1)
+# 选择与该基因互作的基因
+ppi2 <- ppi %>%
+  filter(gene1 == gene_selected) %>%
+  ungroup() %>%
+  # 每行 gene1 与 gene2 的集合去重
+  distinct()
+genes_tar <- unique(c(gene_selected, ppi2$gene2))
+
+genes_net <- ppi %>%
+  filter(gene1 %in% genes_tar & gene2 %in% genes_tar) %>%
+  mutate(group = ifelse(gene2 > gene1,
+    paste(gene1, gene2, sep = "-"),
+    paste(gene2, gene1, sep = "-"))) %>%
+  distinct(group, .keep_all = TRUE)
+
+
+# 计算网络
+# gene 与 gene2 之间的边的权重为 score
+g <- graph_from_data_frame(d = genes_net, vertices = NULL,
+  directed = FALSE)
+
+# 每个点的大小为与该点互作的基因数
+v_size <- degree(g)
+# 边的颜色为 score
+e_color <- genes_net$score
+```
+
+```{r fig.width=15, fig.height=20}
+# 画图。
+plot(g, layout = layout_nicely(g), vertex.size = v_size,
+    legend = legend, width = 5, height = 5, edge.color = e_color,
+    main = paste("Network of genes interacted with", gene_selected),
+    vertex.label.cex = sqrt(v_size / max(v_size)) * 1.5)
 
 ```
 
@@ -214,5 +258,52 @@ ggplot(starwars, aes(x = hair_color)) +
 
 ```{r}
 ## 代码写这里，并运行；
+# 读取文件
+files <- list.files(path = "Exercises and homework/data/talk06/", full.names = TRUE)
+# 提取 scientific_name 和 relative_abundance 两列
+files_df <- lapply(files, function(x) {
+    read_tsv(x, col_names = FALSE, skip = 4, show_col_types = FALSE) %>%
+    select(scientific_name = X4, relative_abundance = X3)
+})
 
+# 添加一列为样本名
+sample_names <- str_extract(files, "PRJEB6070-DE-\\d{3}")
+sampled_df <- lapply(seq_along(files_df), function(x) {
+    files_df[[x]] %>%
+    mutate(sample_name = sample_names[x])
+})
+
+# 以 scientific_name 为 key，将其内容合并为一个 data.frame
+taxon_abundance <- bind_rows(sampled_df) %>%
+    dcast(scientific_name ~ sample_name, value.var = "relative_abundance",
+    # 保留两位小数
+    fun.aggregate = function(x) round(sum(x, na.rm = TRUE), 2)) %>%
+    # 将 NA 值改为 0. 使用 replace_na() 也可以
+    mutate_at(vars(-scientific_name), ~replace(., is.na(.), 0))
+
+
+# 画图, 每个样本的物种堆叠图
+df1 <- taxon_abundance %>%
+  # 每个样本保留相对丰度最高的前10个物种，其他物种合并为 Others
+  arrange(desc(`PRJEB6070-DE-073`), desc(`PRJEB6070-DE-074`),
+    desc(`PRJEB6070-DE-075`), desc(`PRJEB6070-DE-076`),
+    desc(`PRJEB6070-DE-077`)) %>%
+    # 前 11 个物种保留，其他物种合并为 Others
+    mutate(scientific_name = ifelse(row_number() <= 11,
+      scientific_name, "Others")) %>%
+    group_by(scientific_name) %>%
+    # 按照物种名合并
+    summarise_all(sum) %>%
+    melt(id.vars = "scientific_name") %>%
+    tibble() %>%
+    filter(value > 0)
+
+ggplot(df1, aes(x = variable, y = value, fill = scientific_name)) +
+  geom_col(position = "stack", width = 0.6) +
+  scale_fill_manual(values = brewer.pal(n = 12, "Paired")) +
+  theme_bw() +
+  scale_y_continuous(expand = c(0,0)) + # 调整y轴属性，使柱子与X轴坐标接触
+  labs(x = "Samples", y = "Relative Abundance",
+       fill = "Species")
+  
 ```
