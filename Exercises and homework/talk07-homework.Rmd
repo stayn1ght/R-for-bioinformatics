@@ -70,9 +70,22 @@ Sys.getenv("HOME")
 4. 合并为一个字符串，用 ', ' 间隔
 5. 数一下每个成员中`元音字母` （vowel letter）的数量
 
-
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+library(stringr)
+```
 ```{r}
 ## 代码写这里，并运行；
+x <- c('weihua', 'chen');
+## 1. 每个element/成员的长度
+str_length(x)
+## 2. 每个成员首字母大写
+str_to_upper(x)
+## 3. 取每个成员的前两个字符
+str_sub(x, 1, 2)
+## 4. 合并为一个字符串，用 ', ' 间隔
+str_c(x, collapse = ', ')
+## 5. 数一下每个成员中`元音字母` （vowel letter）的数量
+str_count(x, '[aeiou]')
 
 ```
 
