@@ -71,7 +71,8 @@ Sys.getenv("HOME")
 5. 数一下每个成员中`元音字母` （vowel letter）的数量
 
 ```{r echo=TRUE, warning=FALSE, message=FALSE}
-library(stringr)
+library("tidyverse")
+library("stringr")
 ```
 ```{r}
 ## 代码写这里，并运行；
@@ -100,7 +101,6 @@ str_count(x, '[aeiou]')
 
 ```{r}
 ## 代码写这里，并运行；
-library("tidyverse")
 mtcars %>%
   # 筛选行名中包含'Mercedes-Benz'的行
   filter(row.names(mtcars) %>% str_detect('Merc'))
@@ -217,7 +217,7 @@ seq %>% DNAStringSet() %>% reverseComplement() %>% as.character()
 
 问：`stringr::str_pad` 的作用是什么？请举例回答
 
-答：
+答：`stringr::str_pad` 用于字符串的填充，可以指定填充的位置，填充的字符，以及填充的长度。
 
 ### **提取字符串中的N次重复字段**
 
@@ -227,6 +227,9 @@ seq %>% DNAStringSet() %>% reverseComplement() %>% as.character()
 
 ```{r}
 ## 代码写这里，并运行；
+vec <- c( "banana", "coconut", "1232323", "database" )
+# 用正则表达式从字符串中提取任意长度为2字符的两次以上重复
+vec %>% str_extract_all('([a-z]{2})\\1+') %>% unlist()
 
 ```
 
@@ -247,6 +250,8 @@ seq %>% DNAStringSet() %>% reverseComplement() %>% as.character()
 
 ```{r}
 ## 代码写这里，并运行；
-
+vec <- c( "123", "123.45", "0.124", "-1.5", "-0.2", "+1.3", "-11", "-199.62" )
+# 设计一个正则表达式，可以完整识别上面所有格式的数字
+vec %>% str_detect('[-+]?[0-9]+(\\.[0-9]+)?')
 ```
 
