@@ -66,7 +66,9 @@ knit: (
 Sys.info()[["user"]]
 Sys.getenv("HOME")
 ```
-
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+library("tidyverse")
+```
 
 ## 练习与作业1：基础做图 & ggplot2
 
@@ -81,6 +83,28 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
+# 1. 用直方图 histogram 显示 Catholic 列的分布情况；
+# 1.1 基础做图函数
+# 修改标题和x轴标签
+hist(swiss$Catholic, main = "Catholic", xlab = "Catholic")
+
+# 1.2 ggplot2
+# 定制每个区间的范围
+ggplot(swiss, aes(x = Catholic)) +
+  geom_histogram(breaks = seq(0, 100, 10), color = "#E69F00", fill = "#56B4E9") +
+  labs(title = "Catholic", x = "Catholic") +
+  theme_bw()
+# 2. 用散点图显示 Eduction 与 Fertility 的关系并将表示两者关系的线性公式、相关系数和p值画在图的空白处。
+# 2.1 基础做图函数
+plot(swiss$Education, swiss$Fertility, xlab = "Education", ylab = "Fertility", main = "Education vs Fertility")
+abline(lm(swiss$Fertility ~ swiss$Education), col = "red")
+# 相关系数和p值画在图的空白处
+text(15, 80, paste("r = ", round(cor(swiss$Education, swiss$Fertility), 2),
+                    "\n p < 10e-6 ")))
+cor.test(swiss$Education, swiss$Fertility)$p.value
+# 2.2 ggplot2
+ggplot(swiss, aes(x = Education, y = Fertility)) +
+  geom_point()
 
 ```
 
