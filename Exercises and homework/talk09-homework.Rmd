@@ -99,12 +99,17 @@ ggplot(swiss, aes(x = Catholic)) +
 plot(swiss$Education, swiss$Fertility, xlab = "Education", ylab = "Fertility", main = "Education vs Fertility")
 abline(lm(swiss$Fertility ~ swiss$Education), col = "red")
 # 相关系数和p值画在图的空白处
-text(15, 80, paste("r = ", round(cor(swiss$Education, swiss$Fertility), 2),
-                    "\n p < 10e-6 ")))
+text(40, 50, paste("r = ", round(cor(swiss$Education, swiss$Fertility), 2),
+                    "\n p < 10e-6 "))
 cor.test(swiss$Education, swiss$Fertility)$p.value
 # 2.2 ggplot2
 ggplot(swiss, aes(x = Education, y = Fertility)) +
-  geom_point()
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Education vs Fertility", x = "Education", y = "Fertility") +
+  theme_bw() +
+  annotate("text", x = 40, y = 50, label = paste("r = ", round(cor(swiss$Education, swiss$Fertility), 2),
+                    "\n p < 10e-6 "))
 
 ```
 
@@ -119,6 +124,24 @@ ggplot(swiss, aes(x = Education, y = Fertility)) +
 
 ```{r}
 ## 代码写这里，并运行；
+# 散点图
+# 1. 基础做图函数
+plot(iris$Sepal.Length, iris$Petal.Length, col = iris$Species, xlab = "Sepal.Length", ylab = "Petal.Length", main = "Sepal.Length vs Petal.Length")
+legend("bottomright", legend = levels(iris$Species), col = 1:3, pch = 1)
+# 2. ggplot2
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
+  geom_point() +
+  labs(title = "Sepal.Length vs Petal.Length", x = "Sepal.Length", y = "Petal.Length") +
+  theme_bw() +
+  theme(legend.position = "top")
+# boxplot
+# 1. 基础做图函数
+boxplot(iris$Sepal.Length ~ iris$Species, xlab = "Species", ylab = "Sepal.Length", main = "Species vs Sepal.Length")
+# 2. ggplot2
+ggplot(iris, aes(x = Species, y = Sepal.Length)) +
+  geom_boxplot() +
+  labs(title = "Species vs Sepal.Length", x = "Species", y = "Sepal.Length") +
+  theme_bw()
 
 ```
 
@@ -138,7 +161,17 @@ ggplot(swiss, aes(x = Education, y = Fertility)) +
 
 ```{r}
 ## 代码写这里，并运行；
+# 用starwars数据，画boxplot显示身高height与性别gender的关系
+# 1. height为NA的，不显示
+# 2. 用ggsigif包计算 feminine 和 masculine 两种性别的身高是否有显著区别，并在图上显示
+# 3. 将此图的结果保存为变量 p1 ，以备后面使用
+library(ggsignif)
 
+ggplot(starwars, aes(x=gender, y=height)) +
+  geom_boxplot() +
+  labs(title) +
+  theme_bw() +
+  geom_boxplot(outlier.colour = NA)
 ```
 
 ------------------------------------------------------------------------
