@@ -87,7 +87,7 @@ library("lattice")
 
 注：每种图提供**基础做图函数**和**ggplot2**两个版本！
 
-```{r}
+```{r message=FALSE}
 ## 代码写这里，并运行；
 # 1. 用直方图 histogram 显示 Catholic 列的分布情况；
 # 1.1 基础做图函数
@@ -98,10 +98,11 @@ hist(swiss$Catholic, main = "Catholic", xlab = "Catholic")
 # 定制每个区间的范围
 ggplot(swiss, aes(x = Catholic)) +
   geom_histogram(breaks = seq(0, 100, 10),
-    color = "#E69F00", fill = "#56B4E9") +
+    fill = "#56B4E9") +
   labs(title = "Catholic", x = "Catholic") +
   theme_bw()
-# 2. 用散点图显示 Eduction 与 Fertility 的关系并将表示两者关系的线性公式、相关系数和p值画在图的空白处。
+# 2. 用散点图显示 Education 与 Fertility 的关系并将表示两者关系的线性公式、
+# 相关系数和p值画在图的空白处。
 # 2.1 基础做图函数
 plot(swiss$Education, swiss$Fertility,
   xlab = "Education", ylab = "Fertility",
@@ -115,7 +116,7 @@ text(40, 50,
 cor.test(swiss$Education, swiss$Fertility)$p.value
 # 2.2 ggplot2
 ggplot(swiss, aes(x = Education, y = Fertility)) +
-  geom_point() +
+  geom_point(shape = 1) +
   geom_smooth(method = "lm", se = FALSE, color = "red") +
   labs(title = "Education vs Fertility", x = "Education", y = "Fertility") +
   theme_bw() +
@@ -145,12 +146,13 @@ plot(iris$Sepal.Length, iris$Petal.Length,
   main = "Sepal.Length vs Petal.Length")
 legend("bottomright", legend = levels(iris$Species), col = 1:3, pch = 1)
 # 2. ggplot2
-ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length,
+                 color = Species)) +
   geom_point() +
   labs(title = "Sepal.Length vs Petal.Length",
     x = "Sepal.Length", y = "Petal.Length") +
-  theme_bw() +
-  theme(legend.position = "top")
+  theme_classic()
+
 # boxplot
 # 1. 基础做图函数
 boxplot(iris$Sepal.Length ~ iris$Species,
@@ -302,7 +304,7 @@ mdf_mtcars <- mtcars %>% rownames_to_column() %>%
 
 ![](images/talk09-homework-plot06.png)
 
-```{r}
+```{r message = FALSE}
 ## 代码写这里，并运行；
 ggdraw() +
   draw_plot(p3, x = 0, y = 0, width = 0.5, height = 1) +
