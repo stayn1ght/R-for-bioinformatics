@@ -68,6 +68,12 @@ Sys.getenv("HOME")
 ```
 ```{r echo=TRUE, warning=FALSE, message=FALSE}
 library("tidyverse")
+library("ggsignif")
+library("viridis")
+library("cowplot")
+library("gridExtra")
+library("patchwork")
+library("lattice")
 ```
 
 ## 练习与作业1：基础做图 & ggplot2
@@ -175,15 +181,13 @@ ggplot(iris, aes(x = Species, y = Sepal.Length)) +
 
 ```{r}
 ## 代码写这里，并运行；
-library(ggsignif)
-
 (p1 <- ggplot(filter(starwars, !is.na(height) & !is.na(gender)),
     aes(x = gender, y = height)) +
   geom_boxplot() +
   geom_signif(comparisons = list(c("feminine", "masculine")),
     map_signif_level = TRUE) +
   scale_fill_viridis(discrete = TRUE, alpha = 0.6) +
-  theme_ipsum() +
+  theme_light() +
   theme(
     legend.position = "none",
     axis.text.x = element_text(angle = 45, hjust = 1)
@@ -227,8 +231,10 @@ library(ggsignif)
 
 ```{r}
 ## 代码写这里，并运行；
-(p3 <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
-  geom_point() +
+# mtcars 增加 cyl ，加一组 468
+my_mtcars <- bind_rows(mtcars, mutate(mtcars, cyl = 468))
+(p3 <- ggplot(my_mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point(size = 2.5) +
   geom_smooth(method = "loess") +
   facet_wrap(~ cyl, scales = "free", nrow = 2) +
   # facet_grid(. ~ cyl, scales = "free", margins = TRUE) +
@@ -256,6 +262,33 @@ library(ggsignif)
 
 ```{r}
 ## 代码写这里，并运行；
+mdf_mtcars <- mtcars %>% rownames_to_column() %>%
+  arrange(cyl, mpg) %>%
+  mutate(rowname = factor(rowname, levels = rowname)) %>%
+  mutate(id = row_number(),
+    angle = 90 - 360 * (id - 0.5) / n()) %>%
+  select(rowname, mpg, cyl, angle)
+
+(p4 <- ggplot(mdf_mtcars, aes(x = rowname)) +
+  geom_bar(stat = "identity", aes(y = mpg, fill = factor(cyl))) +
+  # Limits of the plot = very important.
+  # The negative value controls the size of the inner circle,
+  # the positive one is useful to add size over each bar
+  ylim(-10, 65) +
+  coord_polar( start = 0, direction = 1, clip = "on") +
+  # 清空坐标轴
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = unit(rep(-1,4), "cm")
+  ) +
+  # Add the labels, using the mdf_mtcars dataframe
+  geom_text(data = mdf_mtcars,
+    aes(x = rowname, y = mpg + 28, label = rowname),
+    color = "black", alpha = 0.9, size = 3,
+    angle = mdf_mtcars$angle))
 
 ```
 
@@ -271,6 +304,12 @@ library(ggsignif)
 
 ```{r}
 ## 代码写这里，并运行；
+ggdraw() +
+  draw_plot(p3, x = 0, y = 0, width = 0.5, height = 1) +
+  draw_plot(p2, 0.5, 0, 0.5, 0.5) +
+  draw_plot(p1, 0.5, 0.5, 0.5, 0.5) +
+  draw_plot_label(c("A", "B", "C"), c(0, 0.5, 0.5),
+    c(1, 1, 0.5), size = 15)
 
 ```
 
@@ -285,6 +324,11 @@ library(ggsignif)
 
 ```{r}
 ## 代码写这里，并运行；
+gridExtra::grid.arrange(p1, p2, p4,
+  nrow = 2, layout_matrix = rbind(
+    c(1, 1),
+    c(2, 3)
+))
 
 ```
 
@@ -299,6 +343,13 @@ library(ggsignif)
 
 ```{r}
 ## 代码写这里，并运行；
+p1 / (p2 | p3) / p4 +
+  plot_annotation(
+    title = "A title",
+    subtitle = "A subtitle",
+    caption = "A caption",
+    tag_levels = "A"
+  )
 
 ```
 
@@ -314,5 +365,5 @@ library(ggsignif)
 
 ```{r}
 ## 代码写这里，并运行；
-
+splom( mtcars[c(1,3,4,5,6)] )
 ```
