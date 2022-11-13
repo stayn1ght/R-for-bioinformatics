@@ -183,7 +183,7 @@ ggplot(iris, aes(x = Species, y = Sepal.Length)) +
 
 ![](images/talk09-homework-plot01.png)
 
-```{r}
+```{r fig.height=6, fig.width=4}
 ## 代码写这里，并运行；
 (p1 <- ggplot(filter(starwars, !is.na(height) & !is.na(gender)),
     aes(x = gender, y = height)) +
@@ -264,7 +264,7 @@ my_mtcars <- bind_rows(mtcars, mutate(mtcars, cyl = 468))
 
 ![](images/talk09-homework-plot05.png)
 
-```{r}
+```{r fig.width = 8, fig.height = 6}
 ## 代码写这里，并运行；
 mdf_mtcars <- mtcars %>% rownames_to_column() %>%
   arrange(cyl, mpg) %>%
@@ -278,7 +278,7 @@ mdf_mtcars <- mtcars %>% rownames_to_column() %>%
   # Limits of the plot = very important.
   # The negative value controls the size of the inner circle,
   # the positive one is useful to add size over each bar
-  ylim(-10, 65) +
+  ylim(-10, 55) +
   coord_polar( start = 0, direction = 1, clip = "on") +
   # 清空坐标轴
   theme_minimal() +
@@ -290,7 +290,7 @@ mdf_mtcars <- mtcars %>% rownames_to_column() %>%
   ) +
   # Add the labels, using the mdf_mtcars dataframe
   geom_text(data = mdf_mtcars,
-    aes(x = rowname, y = mpg + 28, label = rowname),
+    aes(x = rowname, y = mpg + 15, label = rowname),
     color = "black", alpha = 0.9, size = 3,
     angle = mdf_mtcars$angle))
 
@@ -313,7 +313,7 @@ ggdraw() +
   draw_plot(p2, 0.5, 0, 0.5, 0.5) +
   draw_plot(p1, 0.5, 0.5, 0.5, 0.5) +
   draw_plot_label(c("A", "B", "C"), c(0, 0.5, 0.5),
-    c(1, 1, 0.5), size = 15)
+    c(1, 1, 0.5), size = 10)
 
 ```
 
@@ -326,7 +326,7 @@ ggdraw() +
 
 ![](images/talk09-homework-plot07.png)
 
-```{r}
+```{r fig.width = 12, fig.height = 10}
 ## 代码写这里，并运行；
 gridExtra::grid.arrange(p1, p2, p4,
   nrow = 2, layout_matrix = rbind(
@@ -345,10 +345,10 @@ gridExtra::grid.arrange(p1, p2, p4,
 
 ![](images/talk09-homework-plot08.png)
 
-```{r}
+```{r fig.width = 16, fig.height = 20}
 ## 代码写这里，并运行；
-px <- p1 / (p2 | p3)
-px / p4
+p1 / (p3 | p4) / p2 +
+  plot_annotation(tag_levels = "A")
 
 ```
 
@@ -362,7 +362,7 @@ px / p4
 
 `lattice::splom( mtcars[c(1,3,4,5,6)] )`
 
-```{r}
+```{r fig.height = 8, fig.width = 8}
 ## 代码写这里，并运行；
 splom( mtcars[c(1,3,4,5,6)] )
 ```
