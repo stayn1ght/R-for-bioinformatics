@@ -67,7 +67,10 @@ Sys.info()[["user"]]
 Sys.getenv("HOME")
 ```
 
-
+引入R包
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+```
 ## 练习与作业1：数据查看
 
 ------------------------------------------------------------------------
@@ -82,7 +85,18 @@ Sys.getenv("HOME")
 
 ```{r}
 ## 代码写这里，并运行；
-plot(1:10)
+# 1. 随机生成一个数字（numberic）组成的vector，长度为10万，其值符合正态分布；
+x <- rnorm(100000)
+# 2. 用 ggplot2 的 density plot 画出其分布情况；
+ggplot(data.frame(x), aes(x)) +
+    geom_density()
+# 3. 检查 mean +- 1 * sd，mean +- 2 * sd和mean +- 3 * sd 范围内的取值占总值数量的百分比。
+mean(x) + 1 * sd(x)
+mean(x) + 2 * sd(x)
+mean(x) + 3 * sd(x)
+mean(x) - 1 * sd(x)
+mean(x) - 2 * sd(x)
+mean(x) - 3 * sd(x)
 ```
 
 ------------------------------------------------------------------------
