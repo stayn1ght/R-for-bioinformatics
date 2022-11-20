@@ -70,6 +70,7 @@ Sys.getenv("HOME")
 引入R包
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
+library(ggsignif)
 ```
 ## 练习与作业1：数据查看
 
@@ -189,7 +190,8 @@ swiss %>%
             Infant.Mortality < quantile(Infant.Mortality, 0.25) - 1.5 * IQR(Infant.Mortality) |
             Infant.Mortality > quantile(Infant.Mortality, 0.75) + 1.5 * IQR(Infant.Mortality),
             "outlier", "normal" )) %>%
-    filter(outlier == "outlier")
+    filter(outlier == "outlier") %>%
+    select(Infant.Mortality)
 
 ```
 
@@ -206,15 +208,32 @@ head(Data)
 
     -    分别用`t.test`和`wilcox.test`比较男女生步数是否有显著差异；打印出`p.value`
 
-```{r}
+```{r warning=FALSE}
 ## 代码写这里，并运行；
-t.test(Data$Steps ~ Data$Sex)
-wilcox.test()
+# wilcox.test p.value
+with(Data, wilcox.test(Steps ~ Sex))$p.value
+# t.test p.value
+t.test(Data$Steps ~ Data$Sex)$p.value
+
+# 计算两组步数的均值和中位数
+annotation <- Data %>%
+    group_by(Sex) %>%
+    summarise(
+        mean = mean(Steps),
+        median = median(Steps))
+
+# Data的步数分布
+ggplot(Data, aes(Steps, fill = Sex)) +
+    geom_density(position="dodge", alpha = 0.6) +
+    # 在指定位置标注线
+    
+
+    
 ```
 
     -    两种检测方法的`p.value`哪个更显著？为什么？
 
-答： `wilcox.test` 的 `p.value` 更显著，因为 `wilcox.test` 适用于非正态分布的数据。
+答： t.test 检验更显著，t.test计算两组数据中
 
 
 ------------------------------------------------------------------------
@@ -233,9 +252,11 @@ head(scores)
 ```{r}
 ## 代码写这里，并运行；
 scores_wide <- scores %>%
-    spread( Time, Score )
-head(scores.wide, n = 3)
-t.test(scores_wide$Before, scores_wide$After, paired = T)
+    spread(Time, Score)
+head(scores_wide, n = 3)
+t.test(scores_wide$Before, scores_wide$After, paired = T)$p.value
+
+
 ```
 
 ## 练习与作业2：作图
@@ -247,7 +268,7 @@ t.test(scores_wide$Before, scores_wide$After, paired = T)
     -   首先用以下命令装入数据：
 
 ```{r message=FALSE, warning=FALSE}
-data.fig3a <- read_csv( file = "../data/talk10/nc2015_data_for_fig3a.csv" );
+data.fig3a <- read_csv( file = "../data/talk10/nc2015_data_for_fig3a.csv" )
 ```
 
     -   利用两列数据：`tai` `zAA1.at` 做`talk10`中的`boxplot`（详见：`fig3a`的制作）；
@@ -270,9 +291,8 @@ fig3a <- ggplot( data.fig3a, aes( factor(tai), zAA1.at ) ) +
 
 ```{r}
 ## 代码写这里，并运行；
-library(ggsignif)
 fig3a + geom_signif( comparisons = list(1:2, 2:3, 3:4, 4:5), test = wilcox.test,
-step_increase = 0.1 )
+    step_increase = 0.1 )
 ```
 
 ------------------------------------------------------------------------
@@ -294,7 +314,7 @@ cor( mtcars$wt, mtcars$mpg )
 mtcars %>%
     ggplot( aes( wt, mpg ) ) +
     geom_point() +
-    geom_smooth( method = "lm", se = F, color = "red" ) +
+    geom_smooth(method = "lm", color = "red") +
     geom_text( x = 5, y = 20, label = "r = 0.87", size = 5, color = "red" )
 ```
 
@@ -311,7 +331,7 @@ wts2 <- bind_rows(
    tibble( class = 3, age = sample( 15:17, 20, replace = T ), wt = sample( seq(60, 70, by = 0.1), 20 ) )
 )
 
-ggplot(wts2, aes( factor( age ), wt ) ) + geom_boxplot() + coord_flip();
+ggplot(wts2, aes( factor( age ), wt ) ) + geom_boxplot() + coord_flip()
 ```
 
     -   用线性回归检查`age`, `class` 与 `wt` 的关系，构建线性回归模型；
