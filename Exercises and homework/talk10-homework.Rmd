@@ -56,6 +56,11 @@ knit: (
 
     -   non-parametric comparison
 
+```{r setup, include=FALSE, echo=FALSE}
+require("knitr")
+opts_knit$set(root.dir = "E:/all_code/R-for-bioinformatics")
+```
+
 ## 练习与作业：用户验证
 
 请运行以下命令，验证你的用户名。
@@ -121,31 +126,17 @@ length(x[x > mean - 3 * sd & x < mean + 3 * sd]) / count
 
 ```{r}
 ## 代码写这里，并运行；
-# Uniform Distribution (均匀分布)
-x <- runif(100000)
-ggplot(data.frame(x), aes(x)) +
-    geom_density()
-# Normal Distribution (正态分布)
-x <- rnorm(100000)
-ggplot(data.frame(x), aes(x)) +
-    geom_density()
-# Binomial Distribution (二项分布)
-x <- rbinom(100000, 1, 0.5)
-ggplot(data.frame(x), aes(x)) +
-    geom_density()
-# Poisson Distribution (泊松分布)
-x <- rpois(100000, 0.5)
-ggplot(data.frame(x), aes(x)) +
-    geom_density()
-# Exponential Distribution (指数分布)
-x <- rexp(100000, 0.5)
-ggplot(data.frame(x), aes(x)) +
-    geom_density()
-# Gamma Distribution (伽马分布)
-x <- rgamma(100000, 0.5)
-ggplot(data.frame(x), aes(x)) +
-    geom_density()
-
+distributions = bind_rows(
+  tibble(dtr = "unif", data = runif(100000)),
+  tibble(dtr = "norm", data = rnorm(100000)),
+  tibble(dtr = "binom", data = rbinom(100000, 100, 0.5)),
+  tibble(dtr = "pois", data = rpois(100000, 5)),
+  tibble(dtr = "exp", data = rexp(100000)),
+  tibble(dtr = "gamma", data = rgamma(100000, 1))
+)
+ggplot(distributions, aes(x = data)) +
+  geom_density() +
+  facet_wrap(~dtr, ncol = 3, scales = "free")
 ```
 
 ------------------------------------------------------------------------
@@ -166,11 +157,11 @@ mtcars_bin <- mtcars %>%
                 to = max(wt),
                 by = (max(wt) - min(wt)) / 4 ),
             include.lowest = T ))
-# 按 edistance 的区间分组画
+# equal-distance 是等距离分组。
 ggplot( mtcars_bin, aes( edistance, wt ) ) +
     geom_boxplot()
     
-# 显示 esize 每组的数量
+# equal-size bining 保证每个分组的样本数量相同
 table(mtcars_bin$esize)
 
 ```
@@ -226,14 +217,19 @@ annotation <- Data %>%
 ggplot(Data, aes(Steps, fill = Sex)) +
     geom_density(position="dodge", alpha = 0.6) +
     # 在指定位置标注线
-    
-
-    
+    geom_vline(
+        data = annotation,
+        aes(xintercept = mean, linetype = "mean", color = Sex)) +
+    geom_vline(
+        data = annotation,
+        aes(xintercept = median, linetype = "median", color = Sex))
 ```
 
     -    两种检测方法的`p.value`哪个更显著？为什么？
 
-答： t.test 检验更显著，t.test计算两组数据中
+答： t.test 检验更显著，t检验是参数方法，而Wilcoxon秩和检验是非参数方法。
+    当资料满足正态性的假设，参数方法比非参数方法检验效能更高。
+    计算使用的男女步数的数据比较符合正态分布。
 
 
 ------------------------------------------------------------------------
@@ -255,7 +251,7 @@ scores_wide <- scores %>%
     spread(Time, Score)
 head(scores_wide, n = 3)
 t.test(scores_wide$Before, scores_wide$After, paired = T)$p.value
-
+ggplot()
 
 ```
 
