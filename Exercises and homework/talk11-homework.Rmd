@@ -50,8 +50,9 @@ Sys.getenv("HOME")
 ```
 
 ```{r message=FALSE, warning=FALSE}
-library("readr")
 library("tidyverse")
+library("readr")
+library("relaimpo")
 ```
 
 ## 练习与作业1：linear regression
@@ -108,6 +109,24 @@ ggplot(income_comp, aes(x = pred, y = happiness)) +
 
 ```{r}
 ## 代码写这里，并运行；
+heart_dat <- read_csv("data/talk11/heart.data_.zip", show_col_types = FALSE)
+# 线性回归分析，检验 heart.disease 与 biking 和 smoking 的相关性
+heart_lm <- lm(heart.disease ~ biking + smoking, data = heart_dat)
+summary(heart_lm)
+# 画出 heart.disease 与 biking 和 smoking 三者的关系
+heart_bike <- ggplot(heart_dat, aes(x = biking, y = heart.disease)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_text(aes(label = paste("y = ", round(heart_lm$coefficients[1], 2),
+    " + ", round(heart_lm$coefficients[2], 2), " * x1 + ",
+    round(heart_lm$coefficients[3], 2), " * x2", sep = "")),
+    x = 5, y = 6.5, size = 5) +
+  labs(title = "Heart Disease and Biking and Smoking", x = "Biking", y = "Heart Disease")
+
+heart_smoke <- ggplot(heart_dat, aes(x = smoking, y = heart.disease)) +
+  geom_point(color = "red") +
+  geom_smooth(method = "lm", se = FALSE, color = "red")
+
 
 ```
 
