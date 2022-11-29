@@ -53,6 +53,10 @@ Sys.getenv("HOME")
 library("tidyverse")
 library("readr")
 library("relaimpo")
+library("interactions")
+library("caret")
+library("vip")
+library("gridExtra")
 ```
 
 ## 练习与作业1：linear regression
@@ -110,36 +114,80 @@ ggplot(income_comp, aes(x = pred, y = happiness)) +
 ```{r}
 ## 代码写这里，并运行；
 heart_dat <- read_csv("data/talk11/heart.data_.zip", show_col_types = FALSE)
-# 线性回归分析，检验 heart.disease 与 biking 和 smoking 的相关性
-heart_lm <- lm(heart.disease ~ biking + smoking, data = heart_dat)
-summary(heart_lm)
-# 画出 heart.disease 与 biking 和 smoking 三者的关系
-heart_bike <- ggplot(heart_dat, aes(x = biking, y = heart.disease)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-  geom_text(aes(label = paste("y = ", round(heart_lm$coefficients[1], 2),
-    " + ", round(heart_lm$coefficients[2], 2), " * x1 + ",
-    round(heart_lm$coefficients[3], 2), " * x2", sep = "")),
-    x = 5, y = 6.5, size = 5) +
-  labs(title = "Heart Disease and Biking and Smoking", x = "Biking", y = "Heart Disease")
-
-heart_smoke <- ggplot(heart_dat, aes(x = smoking, y = heart.disease)) +
-  geom_point(color = "red") +
-  geom_smooth(method = "lm", se = FALSE, color = "red")
-
-
+# 1. 线性回归分析，检验 heart.disease 与 biking 和 smoking 的相关性
+heart_lm1 <- lm(heart.disease ~ biking + smoking, data = heart_dat)
+summary(heart_lm1)
+coef(heart_lm1)
+heart_lm2 <- lm(heart.disease ~ biking, data = heart_dat)
+heart_lm3 <- lm(heart.disease ~ smoking, data = heart_dat)
+data.frame(Biking = summary(heart_lm2)$r.squared,
+    Smoking = summary(heart_lm3)$r.squared)
+# 2. 写出三者间关系的线性公式
+paste0("HeartDisease = ", round(heart_lm1$coefficients[1], 2),
+    " + ", round(heart_lm1$coefficients[2], 2), " * Biking",
+    " + ", round(heart_lm1$coefficients[3], 2), " * Smoking")
 ```
+```{r}
+# 3. 解释 biking 和 smoking 的影响（方向和程度）
+coef(heart_lm1)
+```
+```{r}
+# 4. biking 和 smoking 能解释多少 heart.disease 的 variance？这个值从哪里获得？
+# 97.96% 的 variance 能被解释, 可以从 summary(heart_lm1)$r.squared 获得
+summary(heart_lm1)$r.squared
+```
+```{r}
+# 5. 用 relaimpo 包的函数计算 biking 和 smoking 对 heart.disease 的重要性。哪个更重要？
+calc.relimp(heart_lm1)
+# 从 relative importance matrix 来看， biking 更重要
+```
+```{r}
+# 6. 用得到的线性模型预测 heart.disease，用点线图画出预测值与真实值的关系，并在图上写出 R2 值。
+heart_pred <- predict(heart_lm1, heart_dat)
+heart_comp <- heart_dat["heart.disease"] %>%
+  mutate(pred = heart_pred)
+ggplot(heart_comp, aes(x = pred, y = heart.disease)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  geom_text(aes(label = paste("R Square = ",
+    round(summary(heart_lm1)$r.squared, 2))),
+    x = 15, y = 8, size = 4)
+
+# 7. 在建模时考虑 biking 和 smoking 的互作关系
+heart_lm4 <- lm(heart.disease ~ biking * smoking, data = heart_dat)
+summary(heart_lm4)
+anova(heart_lm1, heart_lm4)
+data.frame(heart_lm1 = summary(heart_lm1)$r.squared,
+    heart_lm4 = summary(heart_lm4)$r.squared)
+```
+没有提高模型的 R2 值。另外，从 anova 方差分析表中可以看出，
+P 值为 0.477，说明 biking 和 smoking 的互作关系对模型的解释力没有提高。
 
 ------------------------------------------------------------------------
 
 ### **`glm` 相关问题**
 
-用 `glm` 建模时使用`family=binomial`；在预测时， `type=`参数可取值 `link`（默认）和 `response`。请问，两者的区别是什么？请**写代码**举例说明。
+用 `glm` 建模时使用`family=binomial`；
+在预测时， `type=`参数可取值 `link`（默认）和 `response`。请问，两者的区别是什么？请**写代码**举例说明。
 
 ```{r}
 ## 代码写这里，并运行；
+iris_dat <- iris %>% filter(Species %in% c("setosa", "virginica"))
+m_gml <- glm(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width,
+  data = iris_dat, family = binomial)
+set.seed(1231)
+data.frame(predicted = m_gml %>% 
+    predict(iris_dat, type = "link"), original = iris_dat$Species) %>%
+    arrange(original) %>%
+    sample_n(6)
+data.frame(predicted = m_gml %>% 
+    predict(iris_dat, type = "response"), original = iris_dat$Species) %>%
+    arrange(original) %>%
+    sample_n(6)
 
 ```
+`type = "link"` 返回的是 logit 函数的值，也就是 log(odd)； 
+`type = "response"` 返回的是概率值。
 
 ## 练习与作业2：non-linear regression
 
@@ -156,5 +204,58 @@ heart_smoke <- ggplot(heart_dat, aes(x = smoking, y = heart.disease)) +
 
 ```{r}
 ## 代码写这里，并运行；
+library(earth)
+hyper_grid <- expand.grid(
+  degree = 1:3, ## number of interaction degrees
+  nprune = seq(2, 100, length.out = 10) %>% floor() ## number of features to select
+)
 
+em_swiss <- earth(swiss$Fertility ~ ., data = swiss, degree = 2)
+set.seed(1231)
+cv_em_swiss <- train(
+  x = subset(swiss, select = -Fertility),
+  y = swiss$Fertility,
+  method = "earth",
+  metric = "RMSE",
+  trControl = trainControl(method = "cv", number = 10),
+  tuneGrid = hyper_grid
+)
+
+lm_swiss <- lm(swiss$Fertility ~ ., data = swiss)
+set.seed(1231)
+cv_lm_swiss <- train(
+  x = swiss[,-1],
+  y = swiss$Fertility,
+  method = "lm",
+  trControl = trainControl(method = "cv", number = 10),
+  tuneLength = 10
+)
+ggplot(cv_em_swiss)
+bt <- cv_em_swiss$bestTune
+
+res1 <- cv_em_swiss$results %>%
+  filter(degree == bt$degree & nprune == bt$nprune) %>%
+  subset(select = c(RMSE, Rsquared)) %>%
+  mutate(method = "earth")
+res2 <- cv_lm_swiss$results %>%
+  subset(select = c(RMSE, Rsquared)) %>%
+  mutate(method = "lm")
+bind_rows(res1, res2)
 ```
+相比于 earth 方法，lm 方法的 RMSE 值更低，R2 值更高，可以说 lm 方法更好。
+
+```{r fig.width=8, fig.height=6}
+p1 <- vip(cv_em_swiss, geom = "point", value = "gcv") +
+  ggtitle("Generalized cross-validation,\nearth model")
+p2 <- vip(cv_lm_swiss, geom = "point", value = "gcv") +
+  ggtitle("Generalized cross-validation,\nlm model")
+
+grid.arrange(p1, p2, ncol = 2)
+```
+从上图中可以看出，`earth` 模型中Education 和 Catholic 的重要性达到100%，
+Examination 的重要性为40%左右，
+Infant.Mortality 和 Agriculture 的重要性为0%；
+而 `lm` 模型中 Education 的重要性为100%，
+Catholic Infant.Mortality 和 Agriculture 的重要性为40%左右，
+Examination 的重要性为0%。
+只有 Education 在两个模型中的重要性一致，另外四个因素的重要性在两个模型中不一致。
