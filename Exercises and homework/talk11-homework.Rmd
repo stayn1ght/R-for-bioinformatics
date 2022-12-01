@@ -57,6 +57,7 @@ library("interactions")
 library("caret")
 library("vip")
 library("gridExtra")
+library("earth")
 ```
 
 ## 练习与作业1：linear regression
@@ -94,7 +95,7 @@ ggplot(income_comp, aes(x = pred, y = happiness)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   geom_text(aes(label = paste("R2 = ", round(summary(income_lm)$r.squared, 2))),
-    x = 5, y = 6.5, size = 5)
+    x = 5, y = 2, size = 4)
 ```
 
 ------------------------------------------------------------------------
@@ -130,6 +131,8 @@ paste0("HeartDisease = ", round(heart_lm1$coefficients[1], 2),
 ```{r}
 # 3. 解释 biking 和 smoking 的影响（方向和程度）
 coef(heart_lm1)
+# biking 值的升高对应 heart.disease 值的下降，系数为 0.2,
+# smoking 值的升高对应 heart.disease 值的升高，系数 0.17
 ```
 ```{r}
 # 4. biking 和 smoking 能解释多少 heart.disease 的 variance？这个值从哪里获得？
@@ -141,7 +144,7 @@ summary(heart_lm1)$r.squared
 calc.relimp(heart_lm1)
 # 从 relative importance matrix 来看， biking 更重要
 ```
-```{r}
+```{r fig.width = 6, fig.height = 6}
 # 6. 用得到的线性模型预测 heart.disease，用点线图画出预测值与真实值的关系，并在图上写出 R2 值。
 heart_pred <- predict(heart_lm1, heart_dat)
 heart_comp <- heart_dat["heart.disease"] %>%
@@ -170,7 +173,7 @@ P 值为 0.477，说明 biking 和 smoking 的互作关系对模型的解释力�
 用 `glm` 建模时使用`family=binomial`；
 在预测时， `type=`参数可取值 `link`（默认）和 `response`。请问，两者的区别是什么？请**写代码**举例说明。
 
-```{r}
+```{r warning = FALSE}
 ## 代码写这里，并运行；
 iris_dat <- iris %>% filter(Species %in% c("setosa", "virginica"))
 m_gml <- glm(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width,
@@ -202,9 +205,8 @@ data.frame(predicted = m_gml %>%
 
 ![](images/talk11-feature-importance.png)
 
-```{r}
+```{r warning = FALSE}
 ## 代码写这里，并运行；
-library(earth)
 hyper_grid <- expand.grid(
   degree = 1:3, ## number of interaction degrees
   nprune = seq(2, 100, length.out = 10) %>% floor() ## number of features to select
