@@ -58,7 +58,7 @@ knit: (
 
 ```{r setup, include=FALSE, echo=FALSE}
 require("knitr")
-opts_knit$set(root.dir = "E:/all_code/R-for-bioinformatics")
+opts_knit$set(root.dir = "E:/all_code/R-for-bioinformatics/Exercises and homework/")
 ```
 
 ## 练习与作业：用户验证
@@ -145,7 +145,7 @@ ggplot(distributions, aes(x = data)) +
 
     -   什么是`equal-sized bin`和`equal-distance bin`？以`mtcars`为例，将`wt`列按两种方法分组，并显示结果。
 
-```{r}
+```{r fig.width=4, fig.height=8}
 ## 代码写这里，并运行；
 mtcars_bin <- mtcars %>%
     mutate(
@@ -250,9 +250,12 @@ head(scores)
 scores_wide <- scores %>%
     spread(Time, Score)
 head(scores_wide, n = 3)
+ggplot(scores_wide, aes(Before, After)) +
+    geom_point() +
+    geom_abline(intercept = 0, slope = 1, color = "red")
 t.test(scores_wide$Before, scores_wide$After, paired = T)$p.value
-ggplot()
 
+# 参加辅导班后成绩显著提高了
 ```
 
 ## 练习与作业2：作图
@@ -271,21 +274,21 @@ data.fig3a <- read_csv( file = "../data/talk10/nc2015_data_for_fig3a.csv" )
 
     -   用`ggsignif`为相邻的两组做统计分析（如用 `wilcox.test` 函数），并画出`p.value`；
 
-```{r}
+```{r fig.width=4, fig.height=8}
 ## 代码写这里，并运行；
-fig3a <- ggplot( data.fig3a, aes( factor(tai), zAA1.at ) ) +
+(fig3a <- ggplot( data.fig3a, aes( factor(tai), zAA1.at ) ) +
     geom_boxplot( fill = "#22AD5C", linetype = 1 ,outlier.size = 1, width = 0.6) +
     xlab( "tAI group" ) +
     ylab( expression( paste( italic(S[RNA]) ) ) ) +
     scale_x_discrete(breaks= 1:5 , labels= paste("Q", 1:5, sep = "") ) +
-    geom_hline( yintercept = 0, colour = "red", linetype = 2)
+    geom_hline( yintercept = 0, colour = "red", linetype = 2))
 ```
 
 **问：** 这组数据可以用`t.test`吗？为什么？
 
 答：这组数据不能用`t.test`，因为`t.test`适用于正态分布的数据，而这组数据不是正态分布的。
 
-```{r}
+```{r fig.width=4, fig.height=8}
 ## 代码写这里，并运行；
 fig3a + geom_signif( comparisons = list(1:2, 2:3, 3:4, 4:5), test = wilcox.test,
     step_increase = 0.1 )
@@ -311,7 +314,7 @@ mtcars %>%
     ggplot( aes( wt, mpg ) ) +
     geom_point() +
     geom_smooth(method = "lm", color = "red") +
-    geom_text( x = 5, y = 20, label = "r = 0.87", size = 5, color = "red" )
+    geom_text( x = 5, y = 20, label = "r = 0.87  p = ", size = 5, color = "red" )
 ```
 
 ## 练习与作业3：线性模型与预测
@@ -344,9 +347,13 @@ ggplot(wts2, aes( factor( age ), wt ) ) + geom_boxplot() + coord_flip()
 model <- lm( wt ~ age + class, data = wts2 )
 summary( model )
 # 以age, class为输入，用得到的模型预测wt；
-predict( model, data.frame( age = 15, class = 2 ) )
+predict(model, data.frame( age = 15, class = 2 ))
 # 计算预测的wt和实际wt的相关性；
 cor( predict( model ), wts2$wt )
 # 用线性公式显示如何用age, class计算wt的值。
 model$coefficients
+paste0( "wt = ",
+    model$coefficients[1], " + ",
+    model$coefficients[2], " * age + ",
+    model$coefficients[3], " * class" )
 ```
