@@ -141,11 +141,8 @@ a <= b
 
 ------------------------------------------------------------------------
 
-<<<<<<< HEAD
--   **将函数`dim is.numeric is.character is.logical length`应用到下面的`vector`，并展示结果；**
-=======
+
 -   **将函数`dim`, `is.numeric`, `is.character`, `is.logical, `length`应用到下面的`vector`，并展示结果；**
->>>>>>> upstream/master
 
 `x <- 1:12`
 

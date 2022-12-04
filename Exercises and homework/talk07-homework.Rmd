@@ -227,6 +227,13 @@ seq %>%
 问：`stringr::str_pad` 的作用是什么？请举例回答
 
 答：`stringr::str_pad` 用于字符串的填充，可以指定填充的位置，填充的字符，以及填充的长度。
+  
+  ```{r}
+  # 代码写这里，并运行；
+  str_pad("abc", 10, side = "left", pad = "0")
+  str_pad("abc", 10, side = "right", pad = "0")
+  str_pad("abc", 10, side = "both", pad = "0")
+  ```
 
 ### **提取字符串中的N次重复字段**
 
